@@ -1,54 +1,38 @@
-const RPC = "https://rpc.ritualfoundation.org";
+// Data simulasi (nanti ini akan diganti dengan data tarikan dari API blockchain)
+const testnetData = [
+    { wallet: "0x1a2b...3c4d", transactions: 1450 },
+    { wallet: "0x9f8e...7d6c", transactions: 320 },
+    { wallet: "0x5b6a...1f2e", transactions: 2100 },
+    { wallet: "0x4c3d...8b9a", transactions: 890 },
+    { wallet: "0x7e6f...2a1b", transactions: 3400 }
+];
 
-// 🔥 detect wallet provider
-function getProvider() {
-  if (window.ethereum) return window.ethereum;
-
-  alert("Wallet tidak ditemukan (MetaMask / OKX)");
-  return null;
+// Fungsi untuk mengurutkan data dari transaksi tertinggi ke terendah
+function sortData(data) {
+    return data.sort((a, b) => b.transactions - a.transactions);
 }
 
-window.connectWallet = async function () {
-  const provider = getProvider();
-  if (!provider) return;
+// Fungsi untuk memasukkan data ke dalam tabel HTML
+function renderLeaderboard() {
+    const tableBody = document.getElementById('leaderboardBody');
+    tableBody.innerHTML = ''; // Kosongkan tabel sebelum diisi
+    
+    const sortedData = sortData(testnetData);
 
-  try {
-    // 🔥 connect wallet
-    const accounts = await provider.request({
-      method: "eth_requestAccounts"
+    sortedData.forEach((user, index) => {
+        // Membuat elemen baris tabel (tr)
+        const row = document.createElement('tr');
+        
+        // Mengisi kolom-kolom (td)
+        row.innerHTML = `
+            <td>#${index + 1}</td>
+            <td><span class="wallet">${user.wallet}</span></td>
+            <td>${user.transactions.toLocaleString()} TX</td>
+        `;
+        
+        tableBody.appendChild(row);
     });
+}
 
-    const wallet = accounts[0];
-
-    document.getElementById("wallet").innerText =
-      wallet.slice(0,6) + "..." + wallet.slice(-4);
-
-    // 🔥 coba RPC ritual
-    let balance;
-
-    try {
-      const rpcProvider = new ethers.providers.JsonRpcProvider(RPC);
-      balance = await rpcProvider.getBalance(wallet);
-      document.getElementById("status").innerText = "Ritual RPC";
-    } catch {
-      // fallback ke wallet provider
-      const web3 = new ethers.providers.Web3Provider(provider);
-      balance = await web3.getBalance(wallet);
-      document.getElementById("status").innerText = "Wallet RPC";
-    }
-
-    const eth = ethers.utils.formatEther(balance);
-
-    document.getElementById("balance").innerText =
-      parseFloat(eth).toFixed(4) + " RITUAL";
-
-  } catch (err) {
-    console.log("ERROR:", err);
-
-    if (err.code === 4001) {
-      alert("User reject connect");
-    } else {
-      alert("Wallet gagal connect (cek OKX / MetaMask)");
-    }
-  }
-};
+// Jalankan fungsi saat halaman dimuat
+renderLeaderboard();

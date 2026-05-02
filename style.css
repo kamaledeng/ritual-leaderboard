@@ -11,7 +11,7 @@ body {
 
 input {
   padding: 10px;
-  width: 240px;
+  width: 260px;
 }
 
 button {
@@ -33,10 +33,21 @@ a {
 }
 
 .highlight {
+  background: #1e293b;
+  padding: 6px;
+  border-radius: 6px;
   color: #22c55e;
   font-weight: bold;
 }
 
 .box {
   margin: 20px;
+}
+
+.card {
+  background: #1e293b;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 8px;
+  width: 300px;
 }

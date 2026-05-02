@@ -10,7 +10,7 @@
 
         :root {
             --bg-main: #0B0E14;
-            --bg-card: #0e1218; /* Sedikit lebih gelap menyesuaikan referensi */
+            --bg-card: #0e1218;
             --border-color: #2A3241;
             --text-main: #FFFFFF;
             --text-muted: #8B94A5;
@@ -22,11 +22,9 @@
         html { scroll-behavior: smooth; }
 
         body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-main); color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding-bottom: 50px;
+            margin: 0; padding: 0; background-color: var(--bg-main); color: var(--text-main);
+            font-family: 'Inter', sans-serif; display: flex; flex-direction: column; 
+            align-items: center; min-height: 100vh; padding-bottom: 50px;
         }
 
         /* Navbar */
@@ -36,24 +34,19 @@
             margin-bottom: 40px; position: sticky; top: 0; z-index: 100;
         }
 
-        .nav-container {
-            width: 90%; max-width: 900px; display: flex; justify-content: space-between; align-items: center;
-        }
-
+        .nav-container { width: 90%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; }
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-item {
             display: flex; align-items: center; gap: 8px; color: var(--text-muted);
-            text-decoration: none; font-size: 16px; font-weight: 500;
-            transition: color 0.2s; cursor: pointer;
+            text-decoration: none; font-size: 16px; font-weight: 500; transition: color 0.2s; cursor: pointer;
         }
         .nav-item:hover, .nav-item.active { color: var(--text-main); }
         .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         .connect-btn {
             background-color: rgba(139, 92, 246, 0.1); color: var(--accent-ritual);
-            border: 1px solid var(--accent-ritual); padding: 10px 20px;
-            border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
-            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--accent-ritual); padding: 10px 20px; border-radius: 8px; 
+            font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s;
         }
         .connect-btn:hover { background-color: var(--accent-ritual); color: #fff; }
         .connect-btn.connected {
@@ -71,7 +64,6 @@
         .card-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .card-title { font-size: 20px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 10px;}
         
-        /* Streaming Live Badge */
         .streaming-badge {
             display: flex; align-items: center; gap: 8px; color: var(--accent-green);
             font-size: 12px; font-weight: 600; background-color: rgba(0, 255, 136, 0.05);
@@ -79,12 +71,10 @@
         }
         .pulse-circle {
             width: 8px; height: 8px; background-color: var(--accent-green);
-            border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);
-            animation: pulse 1.5s infinite;
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent-green); animation: pulse 1.5s infinite;
         }
         @keyframes pulse { 0% { transform: scale(0.95); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(0.95); opacity: 1; } }
 
-        /* Profile Content */
         .profile-content { display: none; }
         .profile-content.active { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -95,19 +85,16 @@
             color: var(--text-muted); margin-bottom: 25px; display: inline-block; font-size: 14px;
         }
 
-        /* Desain Grid Sesuai Referensi Gambar */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        
         .stat-card-custom {
-            background-color: #0b0f13; border: 1px solid var(--border-color);
-            border-radius: 16px; padding: 25px; display: flex; flex-direction: column;
-            transition: transform 0.2s;
+            background-color: #0b0f13; border: 1px solid var(--border-color); border-radius: 16px; 
+            padding: 25px; display: flex; flex-direction: column; transition: transform 0.2s;
         }
         .stat-card-custom:hover { transform: translateY(-3px); }
         
         .icon-box {
-            width: 45px; height: 45px; border-radius: 12px; display: flex;
-            justify-content: center; align-items: center; font-size: 20px; margin-bottom: 25px;
+            width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; 
+            align-items: center; font-size: 20px; margin-bottom: 25px;
         }
         .icon-green { background-color: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.3); color: var(--accent-green); }
         .icon-purple { background-color: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--accent-ritual); }
@@ -118,10 +105,22 @@
         .currency { font-family: 'Inter', sans-serif; font-size: 16px; color: var(--accent-ritual); font-weight: 600; margin-left: 5px; }
         .emoji-icon { font-size: 16px; margin-bottom: 10px; display: block; }
 
-        /* Disconnected State Overlay */
         .disconnected-overlay { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px 0; text-align: center; }
         .disconnected-overlay.hidden { display: none; }
         .lock-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+
+        /* FITUR PENCARIAN RANK */
+        .search-rank-box {
+            display: flex; align-items: center; background-color: var(--bg-main);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 12px 15px; margin-bottom: 20px; transition: border-color 0.2s;
+        }
+        .search-rank-box:focus-within { border-color: var(--accent-ritual); }
+        .search-rank-box svg { width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 2; margin-right: 15px; }
+        #rankSearchInput {
+            flex: 1; background: transparent; border: none; color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none;
+        }
 
         /* Leaderboard Table */
         .table-container { overflow-x: auto; }
@@ -141,16 +140,15 @@
 
         /* MODAL */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--modal-overlay); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center; z-index: 999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-overlay); 
+            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 999;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content {
-            background-color: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 16px; width: 90%; max-width: 360px; padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s ease;
+            background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; 
+            width: 90%; max-width: 360px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            transform: translateY(20px); transition: transform 0.3s ease;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -159,14 +157,13 @@
         .close-modal:hover { color: var(--text-main); }
         .wallet-option {
             width: 100%; display: flex; align-items: center; justify-content: space-between;
-            background-color: var(--bg-main); border: 1px solid var(--border-color);
-            padding: 15px 20px; border-radius: 12px; margin-bottom: 10px;
-            color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+            background-color: var(--bg-main); border: 1px solid var(--border-color); padding: 15px 20px; 
+            border-radius: 12px; margin-bottom: 10px; color: var(--text-main); font-size: 16px; 
+            font-weight: 500; cursor: pointer; transition: all 0.2s;
         }
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
     </style>
 
-    <!-- Memasukkan Ethers.js untuk menarik data asli dari Blockchain -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body>
@@ -188,7 +185,7 @@
         </div>
     </div>
 
-    <!-- Modal Multi-Wallet -->
+    <!-- Modal Wallet -->
     <div id="walletModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -208,7 +205,6 @@
         <div class="card" id="profile-section">
             <div class="card-header">
                 <h2 class="card-title">My Profile</h2>
-                <!-- Badge Streaming Live persis seperti gambar -->
                 <div class="streaming-badge" id="liveBadge" style="display: none;">
                     <span class="pulse-circle"></span> Streaming live
                 </div>
@@ -224,14 +220,12 @@
                 <div class="wallet-display" id="profileAddress">WALLET: 0x...</div>
                 
                 <div class="stats-grid">
-                    <!-- Kartu Total Transaksi -->
                     <div class="stat-card-custom">
                         <div class="icon-box icon-green">#</div>
                         <h2 class="stat-value" id="profileTxs">0</h2>
                         <p class="stat-label">TOTAL TRANSACTIONS</p>
                     </div>
 
-                    <!-- Kartu Saldo (Balance) -->
                     <div class="stat-card-custom">
                         <div class="icon-box icon-purple">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M16 12h2"></path></svg>
@@ -245,11 +239,18 @@
             </div>
         </div>
 
-        <!-- 2. GLOBAL LEADERBOARD SECTION -->
+        <!-- 2. GLOBAL LEADERBOARD SECTION DENGAN FITUR SEARCH RANK -->
         <div class="card" id="leaderboard-section">
             <div class="card-header">
                 <h2 class="card-title">🏆 Global Leaderboard</h2>
             </div>
+            
+            <!-- FITUR CEK RANK DOMPET -->
+            <div class="search-rank-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="rankSearchInput" placeholder="Cek rank wallet... (Paste address 0x...)">
+            </div>
+
             <div class="table-container">
                 <table>
                     <thead>
@@ -296,48 +297,32 @@
                     const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
-                    
                     walletModal.classList.remove('active');
                     
-                    // Panggil fungsi tarik data asli dari blockchain
                     loadRealUserProfile(account);
                 } catch (error) { console.error("Koneksi dibatalkan:", error); }
             } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
         }
 
-        // FUNGSI INTI: Menarik data ASLI menggunakan Ethers.js
         async function loadRealUserProfile(address) {
             document.getElementById('disconnectedState').classList.add('hidden');
             document.getElementById('connectedState').classList.add('active');
-            liveBadge.style.display = "flex"; // Tampilkan badge streaming
+            liveBadge.style.display = "flex"; 
             
             document.getElementById('profileAddress').textContent = `WALLET: ${address}`;
             
             try {
-                // Membuat sambungan ke provider wallet pengguna (MetaMask)
                 const provider = new ethers.BrowserProvider(window.ethereum);
-                
-                // Ubah teks sementara jadi loading
                 document.getElementById('profileTxs').textContent = "...";
                 document.getElementById('profileBalance').innerHTML = `... <span class="currency">RITUAL</span>`;
 
-                // 1. Mengambil Jumlah Transaksi Asli (Nonce)
                 const txCount = await provider.getTransactionCount(address);
-                
-                // 2. Mengambil Saldo Asli (Balance) dalam format Wei, lalu diubah ke Ether
                 const balanceWei = await provider.getBalance(address);
                 const balanceEth = ethers.formatEther(balanceWei);
-                
-                // Format angka saldo menjadi max 3 desimal
                 const formattedBalance = parseFloat(balanceEth).toFixed(3);
 
-                // Memasukkan data asli ke layar
                 document.getElementById('profileTxs').textContent = txCount;
                 document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
-
-                // Catatan: Data ini diambil dari jaringan manapun wallet Anda sedang terhubung.
-                // Pastikan wallet Anda berada di jaringan Ritual Testnet agar angkanya akurat!
-
             } catch (err) {
                 console.error("Gagal menarik data dari blockchain:", err);
                 document.getElementById('profileTxs').textContent = "Error";
@@ -345,17 +330,20 @@
             }
         }
 
-        // --- Leaderboard Dummy ---
+        // --- Leaderboard Dummy & Fitur Pencarian ---
         const globalLeaderboardData = [
-            { wallet: "0x1a2b890c...3c4df1", txs: 24500 },
-            { wallet: "0x9f8e432a...7d6ca9", txs: 18320 },
-            { wallet: "0x5b6a778b...1f2eb3", txs: 15400 },
-            { wallet: "0x4c3d112e...8b9ac4", txs: 12105 },
-            { wallet: "0x7e6f554c...2a1bd7", txs: 9840 }
+            { wallet: "0x1a2b890c93c4df1e2a", txs: 24500 },
+            { wallet: "0x9f8e432a27d6ca9b5f", txs: 18320 },
+            { wallet: "0x5b6a778b11f2eb3d4c", txs: 15400 },
+            { wallet: "0x4c3d112e88b9ac4e5d", txs: 12105 },
+            { wallet: "0x7e6f554c22a1bd7f8e", txs: 9840 },
+            { wallet: "0xcf3da8d27bc354c8be", txs: 456 } // Contoh wallet dari gambar Anda
         ];
 
         function renderLeaderboard() {
             const tableBody = document.getElementById('leaderboardBody');
+            tableBody.innerHTML = ''; 
+
             globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -367,6 +355,22 @@
             });
         }
         renderLeaderboard();
+
+        // --- LOGIKA FILTER/SEARCH RANK WALLET ---
+        document.getElementById('rankSearchInput').addEventListener('input', function(e) {
+            const filterText = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#leaderboardBody tr');
+            
+            rows.forEach(row => {
+                const walletText = row.querySelector('.wallet-address').textContent.toLowerCase();
+                // Jika wallet cocok dengan ketikan, tampilkan. Jika tidak, sembunyikan.
+                if(walletText.includes(filterText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>

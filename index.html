@@ -1,231 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Ritual Leaderboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritual Faucet & Leaderboard</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+        :root {
+            --bg-main: #0B0E14;
+            --bg-card: #151A22;
+            --border-color: #2A3241;
+            --text-main: #FFFFFF;
+            --text-muted: #8B94A5;
+            --accent-ritual: #8B5CF6; 
+            --accent-green: #10B981;
+            --modal-overlay: rgba(11, 14, 20, 0.85);
+        }
 
-  <style>
-    body {
-      background: #0b1220;
-      color: #e5e7eb;
-      font-family: Arial;
-      margin: 0;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
 
-    .container {
-      width: 90%;
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
+        /* Navbar & Watermark */
+        .navbar {
+            width: 100%;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    h1 {
-      font-size: 28px;
-    }
+        .nav-container {
+            width: 90%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .card {
-      background: #111827;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
+        .watermark-circle {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--accent-ritual);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+        }
 
-    .rank-box {
-      background: #1f2937;
-      padding: 20px;
-      border-radius: 10px;
-      font-size: 28px;
-      text-align: center;
-      margin-top: 10px;
-    }
+        .watermark-circle span {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
 
-    input {
-      padding: 10px;
-      width: 65%;
-      border-radius: 6px;
-      border: none;
-    }
+        .connect-btn {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: var(--accent-ritual);
+            border: 1px solid var(--accent-ritual);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    button {
-      padding: 10px;
-      margin-left: 10px;
-      background: #22c55e;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+        .connect-btn:hover {
+            background-color: var(--accent-ritual);
+            color: #fff;
+        }
 
-    table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
+        .connect-btn.connected {
+            background-color: var(--bg-main);
+            border-color: var(--border-color);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+        }
 
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #1f2937;
-    }
+        .container {
+            width: 90%;
+            max-width: 900px;
+        }
 
-    a {
-      color: #38bdf8;
-      text-decoration: none;
-    }
+        /* Desain Kartu (Cards) */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
 
-    a:hover {
-      text-decoration: underline;
-    }
+        .card-header { margin-bottom: 25px; }
+        .card-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; }
+        .card-subtitle { color: var(--text-muted); font-size: 14px; margin: 0; }
 
-    .you {
-      color: #22c55e;
-      font-weight: bold;
-    }
+        /* Faucet Input */
+        .faucet-box { display: flex; gap: 15px; }
+        .faucet-input-wrapper { flex: 1; }
+        .faucet-input {
+            width: 100%;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px 20px;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .faucet-input:focus { border-color: var(--accent-ritual); }
+        .claim-btn {
+            background-color: var(--accent-ritual);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0 30px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .claim-btn:hover { background-color: #7c3aed; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
 
-    .sub {
-      color: #9ca3af;
-    }
-  </style>
+        /* Leaderboard Table */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { color: var(--text-muted); font-size: 12px; font-weight: 500; text-transform: uppercase; padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 18px 20px; border-bottom: 1px solid rgba(42, 50, 65, 0.5); font-size: 14px; }
+        tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+        .rank-badge {
+            display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center;
+            border-radius: 6px; background-color: var(--bg-main); color: var(--text-muted); font-weight: 600; font-size: 13px;
+        }
+        tr:nth-child(1) .rank-badge { background-color: rgba(251, 191, 36, 0.1); color: #FBBF24; }
+        tr:nth-child(2) .rank-badge { background-color: rgba(156, 163, 175, 0.1); color: #9CA3AF; }
+        tr:nth-child(3) .rank-badge { background-color: rgba(180, 83, 9, 0.1); color: #B45309; }
+        .wallet-address { font-family: 'JetBrains Mono', monospace; color: var(--text-main); }
+        .token-amount { font-weight: 600; color: var(--accent-green); }
+        .tx-count { color: var(--text-muted); font-size: 13px; }
+
+        /* MODAL MULTI-WALLET */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--modal-overlay);
+            backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px; width: 90%; max-width: 360px;
+            padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; }
+        .close-modal:hover { color: var(--text-main); }
+        .wallet-option {
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
+            background-color: var(--bg-main); border: 1px solid var(--border-color);
+            padding: 15px 20px; border-radius: 12px; margin-bottom: 10px;
+            color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
+        .wallet-icon { font-size: 20px; }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="nav-container">
+            <div class="watermark-circle">
+                <span>!kamalz</span>
+            </div>
+            <button id="navConnectBtn" class="connect-btn">Connect Wallet</button>
+        </div>
+    </div>
 
-<h1>⚡ Ritual Activity Leaderboard</h1>
-<p class="sub">Live activity (last 20 blocks)</p>
+    <!-- Modal Multi-Wallet -->
+    <div id="walletModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Connect a Wallet</h3>
+                <button id="closeModal" class="close-modal">&times;</button>
+            </div>
+            <div class="wallet-list">
+                <button class="wallet-option" onclick="connectEVMWallet('MetaMask')">
+                    <span>MetaMask</span> <span class="wallet-icon">🦊</span>
+                </button>
+                <button class="wallet-option" onclick="connectEVMWallet('Rabby')">
+                    <span>Rabby Wallet</span> <span class="wallet-icon">🐰</span>
+                </button>
+                <button class="wallet-option" onclick="connectEVMWallet('Coinbase')">
+                    <span>Coinbase Wallet</span> <span class="wallet-icon">🔵</span>
+                </button>
+                <button class="wallet-option" onclick="connectEVMWallet('WalletConnect')">
+                    <span>WalletConnect</span> <span class="wallet-icon">🔗</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div class="card">
-  <input id="walletInput" placeholder="Enter wallet address (0x...)" />
-  <button onclick="addWallet()">Add</button>
-</div>
+    <div class="container">
+        
+        <!-- Faucet Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">💧 Ritual Testnet Faucet</h2>
+                <p class="card-subtitle">Claim testnet tokens to interact with the DeAI coprocessor network.</p>
+            </div>
+            
+            <div class="faucet-box">
+                <div class="faucet-input-wrapper">
+                    <input type="text" id="walletInput" class="faucet-input" placeholder="Enter your 0x... address or Connect Wallet">
+                </div>
+                <button id="claimBtn" class="claim-btn">Claim Tokens</button>
+            </div>
+        </div>
 
-<div class="card">
-  <h3>Your Rank</h3>
-  <div id="yourWallet">-</div>
-  <div class="rank-box" id="rankBox">#-</div>
-</div>
+        <!-- Leaderboard Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">🏆 Top Testers Leaderboard</h2>
+                <p class="card-subtitle">Ranked by testnet interactions and faucet claims.</p>
+            </div>
 
-<div class="card">
-  <h3>Leaderboard</h3>
-  <p id="loading">Loading...</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Wallet Address</th>
+                            <th>Total Faucet Claimed</th>
+                            <th>Network Txs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Data Leaderboard -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Wallet</th>
-        <th>Score</th>
-      </tr>
-    </thead>
-    <tbody id="leaderboard"></tbody>
-  </table>
-</div>
+    </div>
 
-</div>
+    <!-- LOGIKA JAVASCRIPT -->
+    <script>
+        // --- LOGIKA MULTI-WALLET ---
+        const navConnectBtn = document.getElementById('navConnectBtn');
+        const walletModal = document.getElementById('walletModal');
+        const closeModal = document.getElementById('closeModal');
+        const walletInput = document.getElementById('walletInput');
 
-<script>
-const RPC = "https://rpc.ritualfoundation.org";
-const provider = new ethers.providers.JsonRpcProvider(RPC);
+        // Buka/Tutup Modal
+        navConnectBtn.addEventListener('click', () => {
+            if (!navConnectBtn.classList.contains('connected')) {
+                walletModal.classList.add('active');
+            }
+        });
+        closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
-let wallet = localStorage.getItem("wallet") || "";
-let leaderboard = [];
+        // Fungsi Koneksi Wallet
+        async function connectEVMWallet(walletName) {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Meminta akses ke wallet extension yang aktif (MetaMask/Rabby/dsb)
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    
+                    // Singkat alamat untuk tombol
+                    const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
+                    
+                    // Update Tombol Navigasi
+                    navConnectBtn.textContent = shortAddress;
+                    navConnectBtn.classList.add('connected');
+                    
+                    // OTOMATIS ISI INPUT FAUCET
+                    walletInput.value = account;
+                    
+                    // Tutup Modal
+                    walletModal.classList.remove('active');
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                alert(`Tolong install ekstensi ${walletName} atau wallet Web3 lainnya di browser Anda!`);
+            }
+        }
 
-// 🔥 VALIDASI WALLET
-function isValidWallet(addr) {
-  return /^0x[a-fA-F0-9]{40}$/.test(addr);
-}
+        // --- LOGIKA FAUCET ---
+        const claimBtn = document.getElementById('claimBtn');
+        claimBtn.addEventListener('click', () => {
+            const address = walletInput.value.trim();
+            if (address === "" || !address.startsWith("0x")) {
+                alert("Masukkan alamat wallet Web3 yang valid (berawalan 0x)!"); return;
+            }
+            claimBtn.textContent = "Processing...";
+            claimBtn.style.opacity = "0.7";
+            claimBtn.disabled = true;
 
-// ➕ ADD WALLET
-function addWallet() {
-  const input = document.getElementById("walletInput").value.trim();
+            setTimeout(() => {
+                alert(`Sukses! Token Testnet Ritual telah dikirim ke ${address.substring(0,6)}...`);
+                claimBtn.textContent = "Claimed!";
+                claimBtn.style.backgroundColor = "var(--accent-green)";
+                setTimeout(() => {
+                    claimBtn.textContent = "Claim Tokens";
+                    claimBtn.style.backgroundColor = "var(--accent-ritual)";
+                    claimBtn.disabled = false;
+                }, 3000);
+            }, 1500);
+        });
 
-  if (!isValidWallet(input)) {
-    alert("Masukkan wallet valid (0x...)");
-    return;
-  }
+        // --- LOGIKA LEADERBOARD ---
+        const dummyData = [
+            { wallet: "0x1a2b890c...3c4df1", tokens: "450.00", txs: 1420 },
+            { wallet: "0x9f8e432a...7d6ca9", tokens: "380.50", txs: 1105 },
+            { wallet: "0x5b6a778b...1f2eb3", tokens: "310.00", txs: 980 },
+            { wallet: "0x4c3d112e...8b9ac4", tokens: "295.20", txs: 840 },
+            { wallet: "0x7e6f554c...2a1bd7", tokens: "210.00", txs: 620 }
+        ];
 
-  wallet = input.toLowerCase();
-  localStorage.setItem("wallet", wallet);
-
-  document.getElementById("walletInput").value = "";
-  render();
-}
-
-// 📊 LOAD DATA
-async function load() {
-  document.getElementById("loading").innerText = "Updating...";
-
-  try {
-    const latest = await provider.getBlockNumber();
-    let map = {};
-
-    for (let i = 0; i < 20; i++) {
-      const block = await provider.getBlockWithTransactions(latest - i);
-
-      block.transactions.forEach(tx => {
-        const addr = tx.from.toLowerCase();
-        map[addr] = (map[addr] || 0) + 1;
-      });
-    }
-
-    leaderboard = Object.entries(map).map(([wallet, tx]) => ({
-      wallet,
-      tx
-    }));
-
-    leaderboard.sort((a, b) => b.tx - a.tx);
-
-    render();
-
-  } catch (err) {
-    document.getElementById("loading").innerText = "RPC error...";
-  }
-}
-
-// 🎯 RENDER
-function render() {
-  const table = document.getElementById("leaderboard");
-  table.innerHTML = "";
-
-  let myRank = leaderboard.findIndex(x => x.wallet === wallet);
-  if (myRank === -1) myRank = leaderboard.length;
-
-  document.getElementById("yourWallet").innerText =
-    wallet ? short(wallet) : "No wallet";
-
-  document.getElementById("rankBox").innerText =
-    wallet ? "#" + (myRank + 1) : "#-";
-
-  leaderboard.slice(0, 50).forEach((item, i) => {
-    const isYou = item.wallet === wallet;
-
-    table.innerHTML += `
-      <tr class="${isYou ? "you" : ""}">
-        <td>#${i + 1}</td>
-        <td>
-          <a href="https://explorer.ritualfoundation.org/address/${item.wallet}" target="_blank">
-            ${short(item.wallet)}
-          </a>
-          ${isYou ? "(You)" : ""}
-        </td>
-        <td>${item.tx}</td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("loading").innerText = "";
-}
-
-// ✂️ SHORT ADDRESS
-function short(addr) {
-  return addr.slice(0, 6) + "..." + addr.slice(-4);
-}
-
-// INIT
-load();
-setInterval(load, 10000);
-</script>
-
+        function renderLeaderboard() {
+            const tableBody = document.getElementById('leaderboardBody');
+            dummyData.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="rank-badge">${index + 1}</span></td>
+                    <td><span class="wallet-address">${user.wallet}</span></td>
+                    <td><span class="token-amount">${user.tokens} RITUAL</span></td>
+                    <td><span class="tx-count">${user.txs.toLocaleString()} txs</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        renderLeaderboard();
+    </script>
 </body>
 </html>

@@ -1,41 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ritual Testnet Leaderboard</title>
-  <button onclick="connectWallet()">Connect Wallet</button>
-<p id="walletAddress"></p>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h1>Ritual Testnet Leaderboard</h1>
+<header class="header">
+  <div class="brand">
+    <div class="logo">◆</div>
+    <div>
+      <h1>Ritual Testnet Leaderboard</h1>
+      <p>Track top wallets and activity on Ritual testnet</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge-live">● Testnet Live</span>
+    <button class="btn-primary" onclick="connectWallet()">Connect Wallet</button>
+  </div>
+</header>
 
-<button onclick="connectWallet()">Connect Wallet</button>
+<main class="container">
 
-<p id="walletAddress"></p>
-<div class="card">
-  <h2 id="participants">Loading...</h2>
-  <p>Wallets Tracked</p>
-</div>
+  <!-- Stats -->
+  <section class="stats">
+    <div class="card stat">
+      <div class="stat-value" id="participants">Loading...</div>
+      <div class="stat-label">Wallets Tracked</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-value" id="totalTx">—</div>
+      <div class="stat-label">Total Transactions</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-value" id="whales">—</div>
+      <div class="stat-label">Whales</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-value" id="active">—</div>
+      <div class="stat-label">Active Wallets</div>
+    </div>
+  </section>
 
-<div class="card">
-  <h2>Your Rank</h2>
-  <input id="walletInput" placeholder="Enter wallet address">
-  <button onclick="checkRank()">Check Rank</button>
-  <div id="result"></div>
-</div>
+  <!-- Your Rank -->
+  <section class="card your-rank">
+    <div class="yr-top">
+      <div>
+        <h3>Your Rank</h3>
+        <p id="walletAddress" class="muted">Not connected</p>
+      </div>
+      <div class="yr-input">
+        <input id="walletInput" placeholder="Enter wallet address (0x...)" />
+        <button class="btn-primary" onclick="checkRank()">Check Rank</button>
+      </div>
+    </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Rank</th>
-      <th>Wallet</th>
-      <th>Score</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody"></tbody>
-</table>
+    <div id="yr-result" class="yr-result">
+      <!-- filled by JS -->
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section class="card">
+    <div class="lb-head">
+      <h3>Leaderboard</h3>
+      <input id="search" placeholder="Search wallet..." oninput="searchWallet()" />
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Wallet</th>
+          <th>Score</th>
+          <th>XP</th>
+          <th>Level</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </section>
+
+</main>
 
 <script src="script.js"></script>
 </body>

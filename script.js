@@ -1,43 +1,14 @@
 const RPC = "https://rpc.ritualfoundation.org";
 const provider = new ethers.providers.JsonRpcProvider(RPC);
 
-let userAddress = null;
 let wallets = [];
 let leaderboard = [];
 
-// 🔌 CONNECT WALLET (VERSI PALING COMPATIBLE)
-async function connectWallet() {
-  try {
-    if (!window.ethereum) {
-      alert("MetaMask tidak terdeteksi");
-      return;
-    }
-
-    // fallback lama (lebih kompatibel)
-    if (window.ethereum.request) {
-      const acc = await window.ethereum.request({
-        method: "eth_requestAccounts"
-      });
-      userAddress = acc[0];
-    } else {
-      const acc = await window.ethereum.enable();
-      userAddress = acc[0];
-    }
-
-    wallets.push(userAddress);
-    updateWalletList();
-
-  } catch (err) {
-    console.error(err);
-    alert("User cancel / error connect");
-  }
-}
-
-// ➕ TAMBAH WALLET MANUAL
+// ➕ tambah wallet manual
 function addWallet() {
   const input = document.getElementById("walletInput").value.trim();
 
-  if (!input.startsWith("0x")) {
+  if (!input.startsWith("0x") || input.length < 10) {
     alert("wallet tidak valid");
     return;
   }
@@ -48,7 +19,7 @@ function addWallet() {
   updateWalletList();
 }
 
-// 🧾 LIST WALLET
+// 📋 tampil wallet yg ditrack
 function updateWalletList() {
   const list = document.getElementById("walletList");
   list.innerHTML = "";
@@ -60,7 +31,7 @@ function updateWalletList() {
   });
 }
 
-// 📊 LOAD LEADERBOARD
+// 📊 ambil leaderboard
 async function loadLeaderboard() {
   try {
     const latest = await provider.getBlockNumber();
@@ -89,28 +60,15 @@ async function loadLeaderboard() {
   }
 }
 
-// 🎯 RENDER
+// 🎯 render leaderboard
 function render() {
   const list = document.getElementById("leaderboard");
-  const userBox = document.getElementById("user");
-
   list.innerHTML = "";
-
-  // tampil user rank
-  if (userAddress) {
-    let rank = leaderboard.findIndex(x => x.wallet === userAddress);
-    if (rank === -1) rank = leaderboard.length;
-
-    userBox.innerHTML = `
-      Connected: ${short(userAddress)} <br>
-      Rank: #${rank + 1}
-    `;
-  }
 
   leaderboard.slice(0, 50).forEach((item, i) => {
     const li = document.createElement("li");
 
-    const isUser = wallets.includes(item.wallet);
+    const tracked = wallets.includes(item.wallet);
 
     li.innerHTML = `
       #${i + 1}
@@ -118,20 +76,20 @@ function render() {
         ${short(item.wallet)}
       </a>
       - ${item.tx} tx
-      ${isUser ? "(Tracked)" : ""}
+      ${tracked ? "(Tracked)" : ""}
     `;
 
-    if (isUser) li.classList.add("you");
+    if (tracked) li.classList.add("highlight");
 
     list.appendChild(li);
   });
 }
 
-// ✂️ SHORT
+// ✂️ short wallet
 function short(addr) {
   return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-// INIT
+// init
 loadLeaderboard();
 setInterval(loadLeaderboard, 10000);

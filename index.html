@@ -1,26 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Ritual Leaderboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testnet Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h1>Ritual Testnet Dashboard</h1>
+    <div class="container">
+        <!-- Tempat untuk logo sirkular Anda -->
+        <div class="logo-circle">
+            <span class="logo-text">!kamalz</span>
+        </div>
+        
+        <h1>Top Testers Peringkat</h1>
+        <p class="subtitle">Berdasarkan Jumlah Transaksi di Testnet</p>
 
-<button onclick="connectWallet()">Connect Wallet</button>
+        <div class="table-container">
+            <table id="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Wallet Address</th>
+                        <th>Total Transaksi</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Data dari JavaScript akan muncul di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<div class="card">
-  <p id="wallet">Not connected</p>
-  <h2 id="balance">-</h2>
-  <p id="status"></p>
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

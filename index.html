@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ritual Leaderboard</title>
+  <title>Ritual Activity Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Ritual Leaderboard</h1>
+<h1>Ritual Activity Leaderboard</h1>
+<p class="sub">Based on last 20 blocks</p>
 
-<h3>Tambah Wallet</h3>
-<input id="walletInput" placeholder="0x..." />
-<button onclick="addWallet()">Add Wallet</button>
+<div class="box">
+  <input id="walletInput" placeholder="0x..." />
+  <button onclick="addWallet()">Add Wallet</button>
+</div>
 
+<h3>Your Wallets</h3>
 <ul id="walletList"></ul>
 
+<h3>Your Stats</h3>
+<div id="stats"></div>
+
 <h2>Leaderboard</h2>
+<p id="loading">Loading leaderboard...</p>
 <ul id="leaderboard"></ul>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>

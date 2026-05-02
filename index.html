@@ -8,34 +8,110 @@
 </head>
 <body>
 
-    <div class="nav-bar">
-        <!-- Logo Sirkular Anda -->
-        <div class="logo-circle">
-            <span class="logo-text">!kamalz</span>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="logo-area">
+            <!-- Simple SVG Logo (Lightning) -->
+            <svg class="lightning-icon large" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 10V3L4 14H11V21L20 10H13Z" />
+            </svg>
+            <span class="logo-title">Leaderboard</span>
+            <span class="beta-badge">BETA</span>
         </div>
-        <!-- Tombol Connect Wallet -->
-        <button id="connectWalletBtn" class="connect-btn">Connect Wallet</button>
-    </div>
-
-    <div class="container">
-        <h1>Top Testers Leaderboard</h1>
-        <p class="subtitle">Ranked by Total Transactions on Ritual Testnet</p>
-
-        <div class="table-container">
-            <table id="leaderboardTable">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Wallet Address</th>
-                        <th>Total TXs</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                    <!-- Data will be injected here by JavaScript -->
-                </tbody>
-            </table>
+        <p class="description">Earn SP by trading on Ritual. Top testers receive exclusive rewards.</p>
+        <div class="guide-buttons">
+            <button class="guide-btn">
+                <svg class="lightning-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 10V3L4 14H11V21L20 10H13Z" />
+                </svg>
+                SP Guide <span class="arrow">→</span>
+            </button>
+            <button class="guide-btn">
+                <svg class="guide-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2v-6zm0 8h2v2h-2v-2z" />
+                </svg>
+                NFT Guide <span class="arrow">→</span>
+            </button>
         </div>
-    </div>
+    </header>
+
+    <main class="content">
+        <!-- Main Feature Card -->
+        <div class="card feature-card">
+            <div class="card-header">
+                <svg class="check-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                </svg>
+                <div class="feature-info">
+                    <span class="feature-title">Proof of Swap</span> <span class="epoch">· Epoch #5</span>
+                    <p class="stats">2.3M volume this epoch — claims open when the epoch closes</p>
+                    <p class="epoch-time">🕒 Day 7 · 19h elapsed · Each epoch lasts 1 week</p>
+                </div>
+            </div>
+            <button class="action-btn inactive-btn">Epoch Active — Claim after epoch ends</button>
+        </div>
+
+        <!-- Personal Rank Card -->
+        <div class="card personal-rank-card" id="personalRankCard">
+            <h2 class="section-title">
+                <svg class="shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3zm0 18c-3.92-.93-7-5.06-7-10V6.66l7-2.33 7 2.33V10c0 4.94-3.08 9.07-7 10z"/>
+                </svg>
+                Your Rank
+            </h2>
+            <div class="rank-details">
+                <div class="user-meta">
+                    <img src="your-avatar.png" alt="User" class="avatar-large" id="userAvatar">
+                    <div class="user-info">
+                        <span class="address" id="userAddress">Connect Wallet</span>
+                        <span class="you-badge">You</span>
+                        <div class="user-stats">
+                            <svg class="lightning-icon small" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 10V3L4 14H11V21L20 10H13Z" />
+                            </svg>
+                            <span id="userPoints">0.0</span>
+                            <span class="volume-stat" id="userVolume">... vol</span>
+                            <span class="trades-stat" id="userTrades">... trades</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="rank-number" id="userRankDisplay">#...</div>
+            </div>
+        </div>
+
+        <!-- Filters & Leaderboard Table -->
+        <div class="leaderboard-section">
+            <div class="filters-bar">
+                <div class="time-filters">
+                    <button class="filter-btn active">All Time</button>
+                    <button class="filter-btn">This Week</button>
+                    <button class="filter-btn">Today</button>
+                </div>
+                <button class="refresh-btn" id="refreshBtn">
+                    <svg class="refresh-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="leaderboardTable">
+                    <thead>
+                        <tr>
+                            <th>RANK</th>
+                            <th>TRADER</th>
+                            <th>POINTS</th>
+                            <th>VOLUME (ALL-TIME)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Data injected by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

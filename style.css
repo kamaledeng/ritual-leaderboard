@@ -16,7 +16,7 @@ h1 {
   padding: 20px;
   background: rgba(255,255,255,0.05);
   border-radius: 16px;
-  width: 300px;
+  width: 320px;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }

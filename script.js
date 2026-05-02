@@ -93,3 +93,29 @@ function checkRank() {
 // 🚀 INIT (INI YANG TADI ERROR)
 generateData();
 renderTable();
+async function connectWallet() {
+  if (typeof window.ethereum !== "undefined") {
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      const wallet = accounts[0];
+
+      // tampilkan wallet
+      document.getElementById("walletAddress").innerText =
+        "Connected: " + wallet;
+
+      // auto isi input
+      document.getElementById("walletInput").value = wallet;
+
+      // langsung cek rank
+      checkRank();
+
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    alert("Install MetaMask dulu bro");
+  }
+}

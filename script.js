@@ -1,11 +1,32 @@
+const RPC = "https://rpc.ritualfoundation.org";
+
 let data = [];
 let faucetPool = 100000;
 
-// 🔥 generate sekali saja
-function generateData(n = 200) {
-  for (let i = 0; i < n; i++) {
-    let tx = Math.floor(Math.random() * 120) + 1;
-    let claims = Math.floor(Math.random() * 10);
+// ===== INIT =====
+function init() {
+  let saved = localStorage.getItem("ritualData");
+
+  if (saved) {
+    data = JSON.parse(saved);
+  } else {
+    generateData();
+    save();
+  }
+
+  render();
+}
+
+// ===== SAVE =====
+function save() {
+  localStorage.setItem("ritualData", JSON.stringify(data));
+}
+
+// ===== GENERATE =====
+function generateData() {
+  for (let i = 0; i < 100; i++) {
+    let tx = Math.floor(Math.random() * 50);
+    let claims = Math.floor(Math.random() * 5);
     let score = tx * 2 + claims * 5;
 
     data.push({
@@ -15,130 +36,104 @@ function generateData(n = 200) {
       score
     });
   }
-
-  data.sort((a, b) => b.score - a.score);
 }
 
-// 🔥 helpers
-const xpOf = s => s * 10;
-
-function levelOf(xp) {
-  if (xp < 500) return "Newbie";
-  if (xp < 1500) return "Explorer";
-  return "Ritual Elite";
-}
-
-// 🔥 stats
-function renderStats() {
-  document.getElementById("participants").innerText = data.length * 10 + "+";
-
-  let totalTx = data.reduce((a, b) => a + b.tx, 0);
-  let totalClaims = data.reduce((a, b) => a + b.claims, 0);
-  let faucetLeft = faucetPool - totalClaims * 10;
-
-  document.getElementById("totalTx").innerText = totalTx;
-  document.getElementById("totalClaims").innerText = totalClaims;
-  document.getElementById("faucetLeft").innerText = faucetLeft;
-}
-
-// 🔥 render table
-function renderTable() {
+// ===== RENDER =====
+function render() {
   let tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
 
-  data.forEach((d, i) => {
+  data.sort((a,b)=>b.score-a.score);
+
+  data.forEach((d,i)=>{
     tbody.innerHTML += `
       <tr>
-        <td>#${i + 1}</td>
-        <td>
-          <a href="https://etherscan.io/address/${d.wallet}" target="_blank" class="wallet-link">
-            ${d.wallet.slice(0,6)}...${d.wallet.slice(-4)}
-          </a>
-        </td>
+        <td>#${i+1}</td>
+        <td><a href="https://etherscan.io/address/${d.wallet}" target="_blank">${d.wallet.slice(0,6)}...</a></td>
         <td>${d.score}</td>
-        <td>${xpOf(d.score)}</td>
-        <td>${levelOf(xpOf(d.score))}</td>
         <td>${d.tx}</td>
         <td>${d.claims}</td>
       </tr>
     `;
   });
+
+  // stats
+  document.getElementById("participants").innerText = data.length;
+  document.getElementById("totalTx").innerText =
+    data.reduce((a,b)=>a+b.tx,0);
+
+  let totalClaims = data.reduce((a,b)=>a+b.claims,0);
+
+  document.getElementById("claims").innerText = totalClaims;
+  document.getElementById("faucet").innerText = faucetPool - totalClaims*10;
 }
 
-// 🔥 tampil rank (TIDAK RANDOM LAGI)
-function showYourRank(user, rank, isNew = false) {
-  let xp = xpOf(user.score);
-
-  document.getElementById("yr-result").innerHTML = `
-    <div>${user.wallet.slice(0,6)}...${user.wallet.slice(-4)}</div>
-    <div class="rank-big">#${rank}</div>
-    <div>Score: ${user.score} • XP: ${xp} • Level: ${levelOf(xp)}</div>
-    <div>Tx: ${user.tx} • Faucet Claims: ${user.claims}</div>
-    ${isNew ? `<div class="muted">New Participant 🚀</div>` : ""}
-  `;
-}
-
-// 🔥 CHECK RANK (STABIL)
-function checkRank() {
-  let input = document.getElementById("walletInput").value.trim().toLowerCase();
-
-  if (!input) return;
-
-  let idx = data.findIndex(d => d.wallet.toLowerCase() === input);
-
-  if (idx !== -1) {
-    showYourRank(data[idx], idx + 1);
-  } else {
-    // 🔥 IMPORTANT: simpan user baru biar tidak berubah-ubah
-    let tx = 5;
-    let claims = 1;
-    let score = tx * 2 + claims * 5;
-
-    let newUser = {
-      wallet: input,
-      tx,
-      claims,
-      score
-    };
-
-    data.push(newUser);
-    data.sort((a, b) => b.score - a.score);
-
-    let newIndex = data.findIndex(d => d.wallet === input);
-
-    showYourRank(newUser, newIndex + 1, true);
-    renderTable();
-    renderStats();
-  }
-}
-
-// 🔥 CONNECT WALLET (FIX)
+// ===== CONNECT WALLET (REAL) =====
 async function connectWallet() {
-  if (typeof window.ethereum === "undefined") {
-    alert("Install MetaMask dulu");
+  if (!window.ethereum) {
+    alert("Install MetaMask");
     return;
   }
 
-  try {
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts"
-    });
+  await window.ethereum.request({ method: "eth_requestAccounts" });
 
-    const wallet = accounts[0];
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
 
-    document.getElementById("walletAddress").innerText =
-      "Connected: " + wallet.slice(0,6) + "...";
+  const wallet = await signer.getAddress();
 
-    document.getElementById("walletInput").value = wallet;
+  document.getElementById("walletAddress").innerText =
+    "Connected: " + wallet;
 
-    checkRank();
+  document.getElementById("walletInput").value = wallet;
 
-  } catch (err) {
-    console.log(err);
+  // ===== REAL BALANCE FROM RITUAL RPC =====
+  const rpc = new ethers.providers.JsonRpcProvider(RPC);
+
+  const balance = await rpc.getBalance(wallet);
+  const eth = ethers.utils.formatEther(balance);
+
+  document.getElementById("result").innerHTML = `
+    <h2>${wallet.slice(0,6)}...</h2>
+    <h1>${parseFloat(eth).toFixed(4)} RITUAL</h1>
+    <p>Real Balance (RPC)</p>
+  `;
+}
+
+// ===== CHECK RANK (STABLE) =====
+function checkRank() {
+  let w = document.getElementById("walletInput").value.toLowerCase();
+
+  let i = data.findIndex(x=>x.wallet.toLowerCase()==w);
+
+  if (i !== -1) {
+    show(data[i], i+1);
+  } else {
+    let newUser = {
+      wallet: w,
+      tx: 5,
+      claims: 1,
+      score: 15
+    };
+
+    data.push(newUser);
+    save();
+    render();
+
+    let idx = data.findIndex(x=>x.wallet==w);
+    show(newUser, idx+1);
   }
 }
 
-// 🔥 INIT
-generateData();
-renderStats();
-renderTable();
+// ===== SHOW =====
+function show(u, rank) {
+  document.getElementById("result").innerHTML = `
+    <h2>${u.wallet.slice(0,6)}...</h2>
+    <h1>#${rank}</h1>
+    <p>Score: ${u.score}</p>
+    <p>Tx: ${u.tx} | Claims: ${u.claims}</p>
+  `;
+}
+
+// START
+init();

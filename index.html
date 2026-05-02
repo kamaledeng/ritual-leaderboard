@@ -1,93 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Ritual Testnet Leaderboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ethers -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="header">
-  <div class="brand">
-    <div class="logo">◆</div>
-    <div>
-      <h1>Ritual Testnet Leaderboard</h1>
-      <p>Track top wallets and activity on Ritual testnet</p>
-    </div>
+  <div>
+    <h1>Ritual Testnet Leaderboard</h1>
+    <p>Real wallet + semi-real analytics</p>
   </div>
+
   <div class="header-right">
-    <span class="badge-live">● Testnet Live</span>
-    <button class="btn-primary" onclick="connectWallet()">Connect Wallet</button>
+    <span class="badge">● Testnet Live</span>
+    <button onclick="connectWallet()">Connect Wallet</button>
   </div>
 </header>
 
-<main class="container">
+<div class="container">
 
-  <!-- Stats -->
-  <section class="stats">
-  <div class="card stat">
-    <div class="stat-value" id="participants">Loading...</div>
-    <div class="stat-label">Wallets Tracked</div>
-  </div>
-
-  <div class="card stat">
-    <div class="stat-value" id="totalTx">—</div>
-    <div class="stat-label">Total Transactions</div>
-  </div>
-
-  <div class="card stat">
-    <div class="stat-value" id="totalClaims">—</div>
-    <div class="stat-label">Faucet Claims</div>
-  </div>
-
-  <div class="card stat">
-    <div class="stat-value" id="faucetLeft">—</div>
-    <div class="stat-label">Faucet Remaining</div>
-  </div>
-</section>
-  
-  <!-- Your Rank -->
-  <section class="card your-rank">
-    <div class="yr-top">
-      <div>
-        <h3>Your Rank</h3>
-        <p id="walletAddress" class="muted">Not connected</p>
-      </div>
-      <div class="yr-input">
-        <input id="walletInput" placeholder="Enter wallet address (0x...)" />
-        <button class="btn-primary" onclick="checkRank()">Check Rank</button>
-      </div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="card">
+      <h2 id="participants">—</h2>
+      <p>Wallets</p>
     </div>
 
-    <div id="yr-result" class="yr-result">
-      <!-- filled by JS -->
+    <div class="card">
+      <h2 id="totalTx">—</h2>
+      <p>Total Tx</p>
     </div>
-  </section>
 
-  <!-- Leaderboard -->
-  <section class="card">
-    <div class="lb-head">
-      <h3>Leaderboard</h3>
-      <input id="search" placeholder="Search wallet..." oninput="searchWallet()" />
+    <div class="card">
+      <h2 id="claims">—</h2>
+      <p>Faucet Claims</p>
     </div>
+
+    <div class="card">
+      <h2 id="faucet">—</h2>
+      <p>Faucet Left</p>
+    </div>
+  </div>
+
+  <!-- YOUR RANK -->
+  <div class="card big">
+    <h3>Your Wallet</h3>
+
+    <p id="walletAddress">Not connected</p>
+
+    <input id="walletInput" placeholder="0x..." />
+    <button onclick="checkRank()">Check Rank</button>
+
+    <div id="result"></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <h3>Leaderboard</h3>
 
     <table>
       <thead>
         <tr>
-          <th>Rank</th>
+          <th>#</th>
           <th>Wallet</th>
           <th>Score</th>
-          <th>XP</th>
-          <th>Level</th>
-          <th>Status</th>
+          <th>Tx</th>
+          <th>Claims</th>
         </tr>
       </thead>
+
       <tbody id="tableBody"></tbody>
     </table>
-  </section>
+  </div>
 
-</main>
+</div>
 
 <script src="script.js"></script>
 </body>

@@ -43,7 +43,7 @@
 
     input {
       padding: 10px;
-      width: 70%;
+      width: 65%;
       border-radius: 6px;
       border: none;
     }
@@ -73,6 +73,10 @@
       text-decoration: none;
     }
 
+    a:hover {
+      text-decoration: underline;
+    }
+
     .you {
       color: #22c55e;
       font-weight: bold;
@@ -88,17 +92,17 @@
 
 <div class="container">
 
-<h1>⚡ Ritual Leaderboard</h1>
-<p class="sub">Based on last 20 blocks</p>
+<h1>⚡ Ritual Activity Leaderboard</h1>
+<p class="sub">Live activity (last 20 blocks)</p>
 
 <div class="card">
-  <input id="walletInput" placeholder="Enter wallet (0x...)" />
+  <input id="walletInput" placeholder="Enter wallet address (0x...)" />
   <button onclick="addWallet()">Add</button>
 </div>
 
 <div class="card">
   <h3>Your Rank</h3>
-  <div id="yourRank">-</div>
+  <div id="yourWallet">-</div>
   <div class="rank-box" id="rankBox">#-</div>
 </div>
 
@@ -124,22 +128,31 @@
 const RPC = "https://rpc.ritualfoundation.org";
 const provider = new ethers.providers.JsonRpcProvider(RPC);
 
-let wallets = JSON.parse(localStorage.getItem("wallets") || "[]");
+let wallet = localStorage.getItem("wallet") || "";
 let leaderboard = [];
 
-function addWallet() {
-  const input = document.getElementById("walletInput").value.toLowerCase();
-
-  if (!input.startsWith("0x")) return alert("invalid wallet");
-
-  if (!wallets.includes(input)) {
-    wallets = [input]; // fokus 1 wallet utama
-    localStorage.setItem("wallets", JSON.stringify(wallets));
-  }
-
-  document.getElementById("walletInput").value = "";
+// 🔥 VALIDASI WALLET
+function isValidWallet(addr) {
+  return /^0x[a-fA-F0-9]{40}$/.test(addr);
 }
 
+// ➕ ADD WALLET
+function addWallet() {
+  const input = document.getElementById("walletInput").value.trim();
+
+  if (!isValidWallet(input)) {
+    alert("Masukkan wallet valid (0x...)");
+    return;
+  }
+
+  wallet = input.toLowerCase();
+  localStorage.setItem("wallet", wallet);
+
+  document.getElementById("walletInput").value = "";
+  render();
+}
+
+// 📊 LOAD DATA
 async function load() {
   document.getElementById("loading").innerText = "Updating...";
 
@@ -165,28 +178,27 @@ async function load() {
 
     render();
 
-  } catch {
-    document.getElementById("loading").innerText = "RPC error";
+  } catch (err) {
+    document.getElementById("loading").innerText = "RPC error...";
   }
 }
 
+// 🎯 RENDER
 function render() {
   const table = document.getElementById("leaderboard");
   table.innerHTML = "";
 
-  let myWallet = wallets[0];
-  let myRank = leaderboard.findIndex(x => x.wallet === myWallet);
-
+  let myRank = leaderboard.findIndex(x => x.wallet === wallet);
   if (myRank === -1) myRank = leaderboard.length;
 
-  document.getElementById("yourRank").innerText =
-    myWallet ? short(myWallet) : "No wallet";
+  document.getElementById("yourWallet").innerText =
+    wallet ? short(wallet) : "No wallet";
 
   document.getElementById("rankBox").innerText =
-    "#" + (myRank + 1);
+    wallet ? "#" + (myRank + 1) : "#-";
 
   leaderboard.slice(0, 50).forEach((item, i) => {
-    const isYou = item.wallet === myWallet;
+    const isYou = item.wallet === wallet;
 
     table.innerHTML += `
       <tr class="${isYou ? "you" : ""}">
@@ -205,10 +217,12 @@ function render() {
   document.getElementById("loading").innerText = "";
 }
 
-function short(a) {
-  return a.slice(0,6) + "..." + a.slice(-4);
+// ✂️ SHORT ADDRESS
+function short(addr) {
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
+// INIT
 load();
 setInterval(load, 10000);
 </script>

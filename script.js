@@ -1,11 +1,10 @@
 const RPC = "https://rpc.ritualfoundation.org";
 
 let data = [];
-let faucetPool = 100000;
 
 // ===== INIT =====
 function init() {
-  let saved = localStorage.getItem("ritualData");
+  const saved = localStorage.getItem("ritualData");
 
   if (saved) {
     data = JSON.parse(saved);
@@ -49,7 +48,7 @@ function render() {
     tbody.innerHTML += `
       <tr>
         <td>#${i+1}</td>
-        <td><a href="https://etherscan.io/address/${d.wallet}" target="_blank">${d.wallet.slice(0,6)}...</a></td>
+        <td>${d.wallet.slice(0,6)}...</td>
         <td>${d.score}</td>
         <td>${d.tx}</td>
         <td>${d.claims}</td>
@@ -57,50 +56,68 @@ function render() {
     `;
   });
 
-  // stats
   document.getElementById("participants").innerText = data.length;
-  document.getElementById("totalTx").innerText =
-    data.reduce((a,b)=>a+b.tx,0);
-
-  let totalClaims = data.reduce((a,b)=>a+b.claims,0);
-
-  document.getElementById("claims").innerText = totalClaims;
-  document.getElementById("faucet").innerText = faucetPool - totalClaims*10;
 }
 
-// ===== CONNECT WALLET (REAL) =====
-async function connectWallet() {
+// ===== CONNECT WALLET (FINAL FIX) =====
+window.connectWallet = async function () {
   if (!window.ethereum) {
-    alert("Install MetaMask");
+    alert("Install MetaMask dulu");
     return;
   }
 
-  await window.ethereum.request({ method: "eth_requestAccounts" });
+  try {
+    const chainId = "0x7BB";
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
+    await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
 
-  const wallet = await signer.getAddress();
+    const currentChain = await window.ethereum.request({
+      method: "eth_chainId",
+    });
 
-  document.getElementById("walletAddress").innerText =
-    "Connected: " + wallet;
+    if (currentChain !== chainId) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId }],
+        });
+      } catch (err) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: chainId,
+            chainName: "Ritual Testnet",
+            rpcUrls: ["https://rpc.ritualfoundation.org"],
+            nativeCurrency: {
+              name: "RITUAL",
+              symbol: "RITUAL",
+              decimals: 18
+            }
+          }]
+        });
+      }
+    }
 
-  document.getElementById("walletInput").value = wallet;
+    const wallet = (await window.ethereum.request({
+      method: "eth_accounts",
+    }))[0];
 
-  // ===== REAL BALANCE FROM RITUAL RPC =====
-  const rpc = new ethers.providers.JsonRpcProvider(RPC);
+    document.getElementById("walletAddress").innerText =
+      "Connected: " + wallet.slice(0,6) + "...";
 
-  const balance = await rpc.getBalance(wallet);
-  const eth = ethers.utils.formatEther(balance);
+    document.getElementById("walletInput").value = wallet;
 
-  document.getElementById("result").innerHTML = `
-    <h2>${wallet.slice(0,6)}...</h2>
-    <h1>${parseFloat(eth).toFixed(4)} RITUAL</h1>
-    <p>Real Balance (RPC)</p>
-  `;
-}
+    checkRank();
 
-// ===== CHECK RANK (STABLE) =====
+  } catch (err) {
+    console.log(err);
+    alert("Gagal connect wallet");
+  }
+};
+
+// ===== CHECK RANK =====
 function checkRank() {
   let w = document.getElementById("walletInput").value.toLowerCase();
 
@@ -131,7 +148,6 @@ function show(u, rank) {
     <h2>${u.wallet.slice(0,6)}...</h2>
     <h1>#${rank}</h1>
     <p>Score: ${u.score}</p>
-    <p>Tx: ${u.tx} | Claims: ${u.claims}</p>
   `;
 }
 

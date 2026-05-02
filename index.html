@@ -1,81 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ritual Testnet Analyzer</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Ritual Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Watermark Anda -->
-    <div class="watermark-container">
-        <div class="watermark-circle">
-            <span>!kamalz</span>
-        </div>
-    </div>
+  <h1>Ritual Leaderboard</h1>
 
-    <div class="container">
-        <!-- Bagian Pencarian -->
-        <div class="search-box">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="walletInput" placeholder="Enter wallet address (0x...)">
-            <button id="analyzeBtn">🔥 Analyze Wallet</button>
-        </div>
+  <button onclick="connectWallet()">Connect Wallet</button>
 
-        <!-- Bagian Hasil Analisis (Awalnya disembunyikan) -->
-        <div id="resultSection" class="hidden">
-            
-            <div class="wallet-header">
-                <div class="wallet-info">
-                    <span class="status-dot"></span>
-                    <span class="label">WALLET</span>
-                    <span id="displayWallet" class="address">0x...</span>
-                </div>
-                <button class="copy-btn">Copy</button>
-            </div>
+  <div id="user"></div>
 
-            <div class="stats-grid">
-                <!-- Kartu Total Transaksi -->
-                <div class="stat-card">
-                    <div class="icon-box green-icon">#</div>
-                    <h2 id="totalTx">0</h2>
-                    <p class="stat-label">TOTAL TRANSACTIONS</p>
-                </div>
+  <h2>Leaderboard</h2>
+  <ul id="leaderboard"></ul>
 
-                <!-- Kartu Saldo -->
-                <div class="stat-card">
-                    <div class="icon-box purple-icon">💼</div>
-                    <h2 id="walletBalance">0 <span class="currency">RITUAL</span></h2>
-                    <p class="stat-label">WALLET BALANCE</p>
-                    <p class="stat-sub">Testnet Native Token</p>
-                </div>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script src="script.js"></script>
 
-                <!-- Kartu Hari Aktif -->
-                <div class="stat-card">
-                    <div class="icon-box green-icon">📅</div>
-                    <h2 id="activeDays">0</h2>
-                    <p class="stat-label">ACTIVE DAYS</p>
-                </div>
-
-                <!-- Kartu Bulan Aktif -->
-                <div class="stat-card">
-                    <div class="icon-box purple-icon">📆</div>
-                    <h2 id="activeMonths">0</h2>
-                    <p class="stat-label">ACTIVE MONTHS</p>
-                </div>
-
-                <!-- Kartu Terakhir Aktif -->
-                <div class="stat-card">
-                    <div class="icon-box green-icon">📈</div>
-                    <h2 id="lastActive">—</h2>
-                    <p class="stat-label">LAST ACTIVE</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
 </body>
 </html>

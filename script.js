@@ -1,84 +1,63 @@
-// --- LOGIKA CONNECT WALLET ---
-const connectWalletBtn = document.getElementById('connectWalletBtn');
-let currentAccount = null;
+// Mengambil elemen-elemen dari HTML
+const analyzeBtn = document.getElementById('analyzeBtn');
+const walletInput = document.getElementById('walletInput');
+const resultSection = document.getElementById('resultSection');
+const displayWallet = document.getElementById('displayWallet');
 
-async function connectWallet() {
-    // Mengecek apakah ada wallet web3 yang terpasang di browser
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            // Meminta akses ke wallet pengguna
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            currentAccount = accounts[0];
-            
-            // Memotong address agar tidak terlalu panjang (0x1234...abcd)
-            const shortAddress = `${currentAccount.substring(0, 6)}...${currentAccount.substring(currentAccount.length - 4)}`;
-            
-            // Mengubah tampilan tombol setelah sukses connect
-            connectWalletBtn.textContent = shortAddress;
-            connectWalletBtn.style.backgroundColor = "#222";
-            connectWalletBtn.style.color = "#00ff88";
-            connectWalletBtn.style.border = "1px solid #00ff88";
-            
-        } catch (error) {
-            console.error("Connection rejected or failed:", error);
-        }
-    } else {
-        alert("Please install MetaMask or another Web3 wallet extension to connect!");
+// Elemen angka statistik
+const totalTx = document.getElementById('totalTx');
+const walletBalance = document.getElementById('walletBalance');
+const activeDays = document.getElementById('activeDays');
+const activeMonths = document.getElementById('activeMonths');
+const lastActive = document.getElementById('lastActive');
+
+// Fungsi saat tombol Analyze diklik
+analyzeBtn.addEventListener('click', () => {
+    const address = walletInput.value.trim();
+
+    // Cek apakah input kosong
+    if (address === "") {
+        alert("Masukkan alamat wallet terlebih dahulu!");
+        return;
     }
-}
 
-// Menjalankan fungsi connectWallet saat tombol diklik
-connectWalletBtn.addEventListener('click', connectWallet);
+    // Ubah teks tombol jadi loading
+    analyzeBtn.innerHTML = "⏳ Analyzing...";
+    analyzeBtn.style.opacity = "0.7";
 
-
-// --- LOGIKA DATA LEADERBOARD ---
-async function fetchTestnetData() {
-    try {
-        // GANTI URL INI DENGAN API ENDPOINT RITUAL YANG ASLI NANTINYA
-        const apiUrl = 'https://api-testnet-explorer.ritual.net/api?module=account&action=txlist'; 
+    // Simulasi jeda waktu (seolah-olah sedang mencari data di blockchain)
+    setTimeout(() => {
+        // Tampilkan area hasil
+        resultSection.classList.remove('hidden');
         
-        // --- DATA SIMULASI (Hapus ini jika API sudah siap) ---
-        const dummyData = [
-            { walletAddress: "0x1a2b...3c4d", totalTx: 1450 },
-            { walletAddress: "0x9f8e...7d6c", totalTx: 320 },
-            { walletAddress: "0x5b6a...1f2e", totalTx: 2100 },
-            { walletAddress: "0x4c3d...8b9a", totalTx: 890 }
-        ];
-        renderLeaderboard(dummyData);
-        // ----------------------------------------------------
+        // Tampilkan alamat dompet
+        displayWallet.textContent = address;
 
-        /* KODE ASLI UNTUK API (Buka komentar ini jika sudah ada API-nya)
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        renderLeaderboard(data.result); 
-        */
+        // --- SIMULASI DATA ---
+        // Karena belum ada API asli, kita hasilkan angka acak agar terlihat berfungsi
+        const randomTx = Math.floor(Math.random() * 300) + 10;
+        const randomBalance = (Math.random() * 5).toFixed(3); // 3 angka di belakang koma
+        const randomDays = Math.floor(Math.random() * 30) + 1;
+        
+        // Masukkan angka ke layar
+        totalTx.textContent = randomTx;
+        walletBalance.innerHTML = `${randomBalance} <span class="currency">RITUAL</span>`;
+        activeDays.textContent = randomDays;
+        activeMonths.textContent = Math.ceil(randomDays / 30);
+        lastActive.textContent = "1 min ago";
 
-    } catch (error) {
-        console.error("Failed to fetch blockchain data:", error);
-        document.getElementById('leaderboardBody').innerHTML = "<tr><td colspan='3'>Error loading network data.</td></tr>";
-    }
-}
+        // Kembalikan tombol ke semula
+        analyzeBtn.innerHTML = "🔥 Analyze Wallet";
+        analyzeBtn.style.opacity = "1";
+    }, 1500); // Jeda 1.5 detik
+});
 
-function sortData(data) {
-    return data.sort((a, b) => b.totalTx - a.totalTx);
-}
-
-function renderLeaderboard(blockchainData) {
-    const tableBody = document.getElementById('leaderboardBody');
-    tableBody.innerHTML = ''; 
-    
-    const sortedData = sortData(blockchainData);
-
-    sortedData.forEach((user, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>#${index + 1}</td>
-            <td><span class="wallet">${user.walletAddress}</span></td>
-            <td>${user.totalTx.toLocaleString()}</td>
-        `;
-        tableBody.appendChild(row);
+// Fitur Copy Address
+document.querySelector('.copy-btn').addEventListener('click', () => {
+    const addressToCopy = displayWallet.textContent;
+    navigator.clipboard.writeText(addressToCopy).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = "Copy", 2000);
     });
-}
-
-// Load data saat halaman pertama kali dibuka
-fetchTestnetData();
+});

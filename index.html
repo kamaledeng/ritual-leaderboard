@@ -2,86 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ritual Testnet Leaderboard</title>
+  <title>Ritual Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ethers -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #020617;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .card {
+      background: #0f172a;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
 </head>
 <body>
 
-<header class="header">
-  <div>
-    <h1>Ritual Testnet Leaderboard</h1>
-    <p>Real wallet + semi-real analytics</p>
-  </div>
+<h1>Ritual Wallet Checker</h1>
 
-  <div class="header-right">
-    <span class="badge">● Testnet Live</span>
-    <button onclick="connectWallet()">Connect Wallet</button>
-  </div>
-</header>
+<button onclick="connectWallet()">Connect Wallet</button>
 
-<div class="container">
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="card">
-      <h2 id="participants">—</h2>
-      <p>Wallets</p>
-    </div>
-
-    <div class="card">
-      <h2 id="totalTx">—</h2>
-      <p>Total Tx</p>
-    </div>
-
-    <div class="card">
-      <h2 id="claims">—</h2>
-      <p>Faucet Claims</p>
-    </div>
-
-    <div class="card">
-      <h2 id="faucet">—</h2>
-      <p>Faucet Left</p>
-    </div>
-  </div>
-
-  <!-- YOUR RANK -->
-  <div class="card big">
-    <h3>Your Wallet</h3>
-
-    <p id="walletAddress">Not connected</p>
-
-    <input id="walletInput" placeholder="0x..." />
-    <button onclick="checkRank()">Check Rank</button>
-
-    <div id="result"></div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="card">
-    <h3>Leaderboard</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Wallet</th>
-          <th>Score</th>
-          <th>Tx</th>
-          <th>Claims</th>
-        </tr>
-      </thead>
-
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-
+<div class="card">
+  <p id="wallet">Not connected</p>
+  <h2 id="balance">-</h2>
 </div>
 
-<script src="script.js"></script>
+<script>
+async function connectWallet() {
+  // 🔥 cek metamask
+  if (!window.ethereum) {
+    alert("MetaMask belum install");
+    return;
+  }
+
+  try {
+    // 🔥 connect
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts"
+    });
+
+    const wallet = accounts[0];
+
+    document.getElementById("wallet").innerText = wallet;
+
+    // 🔥 ambil balance (RPC Ritual)
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://rpc.ritualfoundation.org"
+    );
+
+    const balance = await provider.getBalance(wallet);
+
+    const eth = ethers.utils.formatEther(balance);
+
+    document.getElementById("balance").innerText =
+      parseFloat(eth).toFixed(4) + " RITUAL";
+
+  } catch (err) {
+    console.log(err);
+    alert("Connect gagal");
+  }
+}
+</script>
+
 </body>
 </html>

@@ -3,211 +3,21 @@
 <head>
   <title>Ritual Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      margin: 0;
-    }
-
-    h1 {
-      margin-top: 40px;
-    }
-
-    button {
-      padding: 12px 20px;
-      margin-top: 20px;
-      background: #22c55e;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #user {
-      margin-top: 20px;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 30px;
-    }
-
-    li {
-      margin: 10px;
-    }
-
-    a {
-      color: #38bdf8;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .you {
-      color: #22c55e;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<h1>Ritual Leaderboard</h1>
+  <h1>Ritual Leaderboard</h1>
 
-<button onclick="connectWallet()">Connect Wallet</button>
+  <button onclick="connectWallet()">Connect Wallet</button>
 
-<div id="user"></div>
+  <div id="user"></div>
 
-<h2>Top Active Wallets</h2>
-<ul id="leaderboard"></ul>
+  <h2>Top Active Wallets</h2>
+  <ul id="leaderboard"></ul>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-
-<script>
-const RPC = "https://rpc.ritualfoundation.org";
-const provider = new ethers.providers.JsonRpcProvider(RPC);
-
-let leaderboard = [];
-let userAddress = null;
-
-// 🔌 CONNECT WALLET + AUTO ADD NETWORK
-async function connectWallet() {
-  try {
-    if (!window.ethereum) {
-      alert("Install MetaMask dulu");
-      return;
-    }
-
-    // add / switch network Ritual
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x7BB" }] // 1979
-      });
-    } catch (e) {
-      await window.ethereum.request({
-        method: "wallet_addEthereumChain",
-        params: [{
-          chainId: "0x7BB",
-          chainName: "Ritual Testnet",
-          rpcUrls: ["https://rpc.ritualfoundation.org"],
-          nativeCurrency: {
-            name: "RITUAL",
-            symbol: "RITUAL",
-            decimals: 18
-          },
-          blockExplorerUrls: ["https://explorer.ritualfoundation.org"]
-        }]
-      });
-    }
-
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts"
-    });
-
-    userAddress = accounts[0].toLowerCase();
-
-    render();
-
-  } catch (err) {
-    console.error(err);
-    alert("Gagal connect wallet");
-  }
-}
-
-// 📊 LOAD DATA BLOCK
-async function loadLeaderboard() {
-  try {
-    leaderboard = [];
-
-    const latest = await provider.getBlockNumber();
-    let map = {};
-
-    for (let i = 0; i < 20; i++) {
-      const block = await provider.getBlockWithTransactions(latest - i);
-
-      block.transactions.forEach(tx => {
-        const addr = tx.from.toLowerCase();
-        map[addr] = (map[addr] || 0) + 1;
-      });
-    }
-
-    leaderboard = Object.entries(map).map(([wallet, tx]) => ({
-      wallet,
-      tx
-    }));
-
-    leaderboard.sort((a, b) => b.tx - a.tx);
-
-    render();
-
-  } catch (err) {
-    console.log("RPC error, retry...");
-  }
-}
-
-// 🎯 RENDER UI
-function render() {
-  const list = document.getElementById("leaderboard");
-  const userBox = document.getElementById("user");
-
-  list.innerHTML = "";
-
-  let userRank = leaderboard.findIndex(x => x.wallet === userAddress);
-
-  if (userAddress && userRank === -1) {
-    userRank = leaderboard.length;
-  }
-
-  if (userAddress) {
-    let tx = 0;
-    const found = leaderboard.find(x => x.wallet === userAddress);
-    if (found) tx = found.tx;
-
-    userBox.innerHTML = `
-      <h3>Your Rank</h3>
-      <p>${short(userAddress)} (You)</p>
-      <p>Rank: #${userRank + 1}</p>
-      <p>TX: ${tx}</p>
-    `;
-  }
-
-  leaderboard.slice(0, 50).forEach((item, index) => {
-    const li = document.createElement("li");
-
-    const isYou = item.wallet === userAddress;
-
-    li.innerHTML = `
-      #${index + 1}
-      <a href="https://explorer.ritualfoundation.org/address/${item.wallet}" target="_blank">
-        ${short(item.wallet)}
-      </a>
-      - ${item.tx} tx
-      ${isYou ? "(You)" : ""}
-    `;
-
-    if (isYou) li.classList.add("you");
-
-    list.appendChild(li);
-  });
-}
-
-// ✂️ SHORT WALLET
-function short(addr) {
-  return addr.slice(0, 6) + "..." + addr.slice(-4);
-}
-
-// 🚀 INIT
-loadLeaderboard();
-setInterval(loadLeaderboard, 10000);
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>

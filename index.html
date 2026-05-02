@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ritual Testnet Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Ritual Testnet Leaderboard</h1>
+
+<div class="card">
+  <h2 id="participants">Loading...</h2>
+  <p>Wallets Tracked</p>
+</div>
+
+<div class="card">
+  <h2>Your Rank</h2>
+  <input id="walletInput" placeholder="Enter wallet address">
+  <button onclick="checkRank()">Check Rank</button>
+
+  <p id="result"></p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Wallet</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script src="script.js"></script>
+</body>
+</html>

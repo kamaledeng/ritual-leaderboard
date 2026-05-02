@@ -1,0 +1,24 @@
+body {
+  background: #0b0f1a;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+.card {
+  margin: 20px;
+  padding: 20px;
+  background: #111827;
+  border-radius: 10px;
+}
+
+table {
+  width: 80%;
+  margin: auto;
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}

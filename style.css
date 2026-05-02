@@ -19,11 +19,16 @@ button {
   cursor: pointer;
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+}
+
 a {
   color: #38bdf8;
 }
 
-.you {
+.highlight {
   color: #22c55e;
   font-weight: bold;
 }

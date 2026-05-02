@@ -1,26 +1,95 @@
 body {
-  background: #020617;
-  color: white;
-  font-family: Arial;
-  text-align: center;
-  padding: 40px;
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace; /* Gaya font ala tech/coding */
+    background-color: #050505;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-button {
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  background: #6366f1;
-  color: white;
-  cursor: pointer;
+.container {
+    background-color: #111111;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+    border: 1px solid #222;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
 }
 
-.card {
-  margin-top: 20px;
-  background: #0f172a;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+/* Desain Logo Sirkular */
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #00ff88;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+}
+
+.logo-text {
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+h1 {
+    color: #ffffff;
+    margin-bottom: 5px;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    color: #888;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+th {
+    color: #00ff88;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+td {
+    font-size: 14px;
+}
+
+/* Efek saat baris disorot */
+tbody tr:hover {
+    background-color: #1a1a1a;
+    transition: background-color 0.2s ease;
+}
+
+/* Gaya khusus untuk dompet agar terlihat seperti kode */
+.wallet {
+    color: #aaa;
+    background-color: #222;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
 }

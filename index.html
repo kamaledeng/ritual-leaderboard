@@ -10,99 +10,51 @@
 
         :root {
             --bg-main: #0B0E14;
-            --bg-card: #151A22;
+            --bg-card: #0e1218; /* Sedikit lebih gelap menyesuaikan referensi */
             --border-color: #2A3241;
             --text-main: #FFFFFF;
             --text-muted: #8B94A5;
             --accent-ritual: #8B5CF6; 
-            --accent-green: #10B981;
+            --accent-green: #00ff88;
             --modal-overlay: rgba(11, 14, 20, 0.85);
         }
 
-        html {
-            scroll-behavior: smooth; /* Efek scroll halus */
-        }
+        html { scroll-behavior: smooth; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-main);
-            color: var(--text-main);
+            margin: 0; padding: 0;
+            background-color: var(--bg-main); color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-bottom: 50px;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding-bottom: 50px;
         }
 
-        /* Navbar & Navigation Links */
+        /* Navbar */
         .navbar {
-            width: 100%;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-card);
-            display: flex;
-            justify-content: center;
-            margin-bottom: 40px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            width: 100%; padding: 15px 0; border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-card); display: flex; justify-content: center;
+            margin-bottom: 40px; position: sticky; top: 0; z-index: 100;
         }
 
         .nav-container {
-            width: 90%;
-            max-width: 900px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 90%; max-width: 900px; display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* Desain Menu Navigasi Atas */
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
+        .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 500;
-            transition: color 0.2s;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 8px; color: var(--text-muted);
+            text-decoration: none; font-size: 16px; font-weight: 500;
+            transition: color 0.2s; cursor: pointer;
         }
-
-        .nav-item:hover, .nav-item.active {
-            color: var(--text-main);
-        }
-
-        .nav-item svg {
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .nav-item:hover, .nav-item.active { color: var(--text-main); }
+        .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         .connect-btn {
-            background-color: rgba(139, 92, 246, 0.1);
-            color: var(--accent-ritual);
-            border: 1px solid var(--accent-ritual);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: all 0.2s;
+            background-color: rgba(139, 92, 246, 0.1); color: var(--accent-ritual);
+            border: 1px solid var(--accent-ritual); padding: 10px 20px;
+            border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: all 0.2s;
         }
-
         .connect-btn:hover { background-color: var(--accent-ritual); color: #fff; }
         .connect-btn.connected {
             background-color: var(--bg-main); border-color: var(--border-color);
@@ -111,39 +63,63 @@
 
         .container { width: 90%; max-width: 900px; }
 
-        /* General Card Design */
         .card {
             background-color: var(--bg-card); border: 1px solid var(--border-color);
             border-radius: 16px; padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); position: relative; overflow: hidden;
-            scroll-margin-top: 100px; /* Jarak scroll agar tidak tertutup navbar */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); scroll-margin-top: 100px;
         }
-        .card-header { margin-bottom: 25px; }
-        .card-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px;}
-        .card-subtitle { color: var(--text-muted); font-size: 14px; margin: 0; }
+        .card-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 20px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 10px;}
+        
+        /* Streaming Live Badge */
+        .streaming-badge {
+            display: flex; align-items: center; gap: 8px; color: var(--accent-green);
+            font-size: 12px; font-weight: 600; background-color: rgba(0, 255, 136, 0.05);
+            padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        .pulse-circle {
+            width: 8px; height: 8px; background-color: var(--accent-green);
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(0.95); opacity: 1; } }
 
-        /* Profile Section */
+        /* Profile Content */
         .profile-content { display: none; }
         .profile-content.active { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .wallet-display {
             background-color: var(--bg-main); border: 1px solid var(--border-color);
-            padding: 15px 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace;
-            color: var(--accent-green); margin-bottom: 20px; display: inline-block;
+            padding: 12px 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted); margin-bottom: 25px; display: inline-block; font-size: 14px;
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .stat-box { background-color: var(--bg-main); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; }
-        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
-        .stat-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
-        .token-symbol { font-size: 14px; color: var(--accent-ritual); margin-left: 5px; }
+        /* Desain Grid Sesuai Referensi Gambar */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .stat-card-custom {
+            background-color: #0b0f13; border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 25px; display: flex; flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .stat-card-custom:hover { transform: translateY(-3px); }
+        
+        .icon-box {
+            width: 45px; height: 45px; border-radius: 12px; display: flex;
+            justify-content: center; align-items: center; font-size: 20px; margin-bottom: 25px;
+        }
+        .icon-green { background-color: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.3); color: var(--accent-green); }
+        .icon-purple { background-color: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--accent-ritual); }
+        
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: var(--text-main); margin: 0 0 10px 0; letter-spacing: -1px; }
+        .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-weight: 600;}
+        .stat-sub { font-size: 11px; color: #555; margin: 5px 0 0 0; font-style: italic; }
+        .currency { font-family: 'Inter', sans-serif; font-size: 16px; color: var(--accent-ritual); font-weight: 600; margin-left: 5px; }
+        .emoji-icon { font-size: 16px; margin-bottom: 10px; display: block; }
 
         /* Disconnected State Overlay */
-        .disconnected-overlay {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 40px 0; text-align: center;
-        }
+        .disconnected-overlay { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px 0; text-align: center; }
         .disconnected-overlay.hidden { display: none; }
         .lock-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
 
@@ -167,8 +143,8 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--modal-overlay); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            display: flex; justify-content: center; align-items: center; z-index: 999;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content {
@@ -188,34 +164,26 @@
             color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s;
         }
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
-        .wallet-icon { font-size: 20px; }
     </style>
+
+    <!-- Memasukkan Ethers.js untuk menarik data asli dari Blockchain -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body>
 
     <!-- Navbar -->
     <div class="navbar">
         <div class="nav-container">
-            
-            <!-- Menu Navigasi Baru -->
             <div class="nav-links">
                 <a href="#profile-section" class="nav-item active" id="navProfile">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     Profile
                 </a>
                 <a href="#leaderboard-section" class="nav-item" id="navLeaderboard">
-                    <svg viewBox="0 0 24 24">
-                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     Leaderboard
                 </a>
             </div>
-
             <button id="navConnectBtn" class="connect-btn">Connect Wallet</button>
         </div>
     </div>
@@ -228,9 +196,8 @@
                 <button id="closeModal" class="close-modal">&times;</button>
             </div>
             <div class="wallet-list">
-                <button class="wallet-option" onclick="connectEVMWallet('MetaMask')"><span>MetaMask</span> <span class="wallet-icon">🦊</span></button>
-                <button class="wallet-option" onclick="connectEVMWallet('Rabby')"><span>Rabby Wallet</span> <span class="wallet-icon">🐰</span></button>
-                <button class="wallet-option" onclick="connectEVMWallet('Coinbase')"><span>Coinbase Wallet</span> <span class="wallet-icon">🔵</span></button>
+                <button class="wallet-option" onclick="connectEVMWallet('MetaMask')"><span>MetaMask</span> <span>🦊</span></button>
+                <button class="wallet-option" onclick="connectEVMWallet('Rabby')"><span>Rabby Wallet</span> <span>🐰</span></button>
             </div>
         </div>
     </div>
@@ -240,29 +207,39 @@
         <!-- 1. MY PROFILE SECTION -->
         <div class="card" id="profile-section">
             <div class="card-header">
-                <h2 class="card-title">👤 My Profile</h2>
-                <p class="card-subtitle">Your personal testnet statistics and faucet usage.</p>
+                <h2 class="card-title">My Profile</h2>
+                <!-- Badge Streaming Live persis seperti gambar -->
+                <div class="streaming-badge" id="liveBadge" style="display: none;">
+                    <span class="pulse-circle"></span> Streaming live
+                </div>
             </div>
 
-            <!-- Jika Belum Connect -->
             <div id="disconnectedState" class="disconnected-overlay">
                 <div class="lock-icon">🔒</div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Please connect your wallet to view your personal testnet data.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Please connect your wallet to view your on-chain data.</p>
                 <button class="connect-btn" onclick="document.getElementById('walletModal').classList.add('active')">Connect to View</button>
             </div>
 
-            <!-- Jika Sudah Connect -->
             <div id="connectedState" class="profile-content">
-                <div class="wallet-display" id="profileAddress">0x...</div>
+                <div class="wallet-display" id="profileAddress">WALLET: 0x...</div>
                 
                 <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="profileTxs">0</div>
-                        <div class="stat-label">Total Transactions</div>
+                    <!-- Kartu Total Transaksi -->
+                    <div class="stat-card-custom">
+                        <div class="icon-box icon-green">#</div>
+                        <h2 class="stat-value" id="profileTxs">0</h2>
+                        <p class="stat-label">TOTAL TRANSACTIONS</p>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="profileFaucet">0<span class="token-symbol">RITUAL</span></div>
-                        <div class="stat-label">Total Faucet Used</div>
+
+                    <!-- Kartu Saldo (Balance) -->
+                    <div class="stat-card-custom">
+                        <div class="icon-box icon-purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M16 12h2"></path></svg>
+                        </div>
+                        <h2 class="stat-value" id="profileBalance">0 <span class="currency">RITUAL</span></h2>
+                        <span class="emoji-icon">🔮</span>
+                        <p class="stat-label">WALLET BALANCE</p>
+                        <p class="stat-sub">Testnet Native Token</p>
                     </div>
                 </div>
             </div>
@@ -272,9 +249,7 @@
         <div class="card" id="leaderboard-section">
             <div class="card-header">
                 <h2 class="card-title">🏆 Global Leaderboard</h2>
-                <p class="card-subtitle">Ranking of all testnet users based on total transactions.</p>
             </div>
-
             <div class="table-container">
                 <table>
                     <thead>
@@ -285,7 +260,7 @@
                         </tr>
                     </thead>
                     <tbody id="leaderboardBody">
-                        <!-- Data akan di-inject oleh JavaScript -->
+                        <!-- Data Leaderboard -->
                     </tbody>
                 </table>
             </div>
@@ -295,91 +270,92 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        // --- LOGIKA MENU NAVIGASI ---
+        // --- Navigasi ---
         const navProfile = document.getElementById('navProfile');
         const navLeaderboard = document.getElementById('navLeaderboard');
+        navProfile.addEventListener('click', () => { navProfile.classList.add('active'); navLeaderboard.classList.remove('active'); });
+        navLeaderboard.addEventListener('click', () => { navLeaderboard.classList.add('active'); navProfile.classList.remove('active'); });
 
-        // Mengubah warna ikon menjadi putih/aktif saat diklik
-        navProfile.addEventListener('click', () => {
-            navProfile.classList.add('active');
-            navLeaderboard.classList.remove('active');
-        });
-
-        navLeaderboard.addEventListener('click', () => {
-            navLeaderboard.classList.add('active');
-            navProfile.classList.remove('active');
-        });
-
-        // --- LOGIKA MULTI-WALLET & PROFILE ---
+        // --- Wallet & Real Data Fetching (Ethers.js) ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
+        const liveBadge = document.getElementById('liveBadge');
         
-        const disconnectedState = document.getElementById('disconnectedState');
-        const connectedState = document.getElementById('connectedState');
-        const profileAddress = document.getElementById('profileAddress');
-        const profileTxs = document.getElementById('profileTxs');
-        const profileFaucet = document.getElementById('profileFaucet');
-
         navConnectBtn.addEventListener('click', () => {
-            if (!navConnectBtn.classList.contains('connected')) {
-                walletModal.classList.add('active');
-            }
+            if (!navConnectBtn.classList.contains('connected')) walletModal.classList.add('active');
         });
         closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
-        async function connectEVMWallet(walletName) {
+        async function connectEVMWallet() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     const account = accounts[0];
                     
                     const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
-                    
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
                     
-                    loadUserProfile(account);
                     walletModal.classList.remove('active');
-                } catch (error) {
-                    console.error("Koneksi dibatalkan:", error);
-                }
-            } else {
-                alert(`Tolong install ekstensi ${walletName} atau wallet Web3 lainnya!`);
+                    
+                    // Panggil fungsi tarik data asli dari blockchain
+                    loadRealUserProfile(account);
+                } catch (error) { console.error("Koneksi dibatalkan:", error); }
+            } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
+        }
+
+        // FUNGSI INTI: Menarik data ASLI menggunakan Ethers.js
+        async function loadRealUserProfile(address) {
+            document.getElementById('disconnectedState').classList.add('hidden');
+            document.getElementById('connectedState').classList.add('active');
+            liveBadge.style.display = "flex"; // Tampilkan badge streaming
+            
+            document.getElementById('profileAddress').textContent = `WALLET: ${address}`;
+            
+            try {
+                // Membuat sambungan ke provider wallet pengguna (MetaMask)
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                
+                // Ubah teks sementara jadi loading
+                document.getElementById('profileTxs').textContent = "...";
+                document.getElementById('profileBalance').innerHTML = `... <span class="currency">RITUAL</span>`;
+
+                // 1. Mengambil Jumlah Transaksi Asli (Nonce)
+                const txCount = await provider.getTransactionCount(address);
+                
+                // 2. Mengambil Saldo Asli (Balance) dalam format Wei, lalu diubah ke Ether
+                const balanceWei = await provider.getBalance(address);
+                const balanceEth = ethers.formatEther(balanceWei);
+                
+                // Format angka saldo menjadi max 3 desimal
+                const formattedBalance = parseFloat(balanceEth).toFixed(3);
+
+                // Memasukkan data asli ke layar
+                document.getElementById('profileTxs').textContent = txCount;
+                document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
+
+                // Catatan: Data ini diambil dari jaringan manapun wallet Anda sedang terhubung.
+                // Pastikan wallet Anda berada di jaringan Ritual Testnet agar angkanya akurat!
+
+            } catch (err) {
+                console.error("Gagal menarik data dari blockchain:", err);
+                document.getElementById('profileTxs').textContent = "Error";
+                document.getElementById('profileBalance').innerHTML = `Error`;
             }
         }
 
-        function loadUserProfile(address) {
-            disconnectedState.classList.add('hidden');
-            connectedState.classList.add('active');
-            
-            profileAddress.textContent = address;
-
-            const simulatedTxs = Math.floor(Math.random() * 500) + 50;
-            const simulatedFaucet = (Math.random() * 200 + 10).toFixed(2);
-
-            profileTxs.textContent = simulatedTxs.toLocaleString();
-            profileFaucet.innerHTML = `${simulatedFaucet}<span class="token-symbol">RITUAL</span>`;
-        }
-
-        // --- LOGIKA DATA LEADERBOARD GLOBAL ---
+        // --- Leaderboard Dummy ---
         const globalLeaderboardData = [
             { wallet: "0x1a2b890c...3c4df1", txs: 24500 },
             { wallet: "0x9f8e432a...7d6ca9", txs: 18320 },
             { wallet: "0x5b6a778b...1f2eb3", txs: 15400 },
             { wallet: "0x4c3d112e...8b9ac4", txs: 12105 },
-            { wallet: "0x7e6f554c...2a1bd7", txs: 9840 },
-            { wallet: "0x2b4c998d...1a2be5", txs: 7650 },
-            { wallet: "0x8a9b332f...4c5df8", txs: 6100 },
-            { wallet: "0x3d4e556f...7b8c9d", txs: 5430 },
-            { wallet: "0x11223344...aabbcc", txs: 4120 },
-            { wallet: "0x99887766...ddeeff", txs: 3900 }
+            { wallet: "0x7e6f554c...2a1bd7", txs: 9840 }
         ];
 
         function renderLeaderboard() {
             const tableBody = document.getElementById('leaderboardBody');
-            tableBody.innerHTML = ''; 
-
             globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -390,7 +366,6 @@
                 tableBody.appendChild(row);
             });
         }
-        
         renderLeaderboard();
     </script>
 </body>

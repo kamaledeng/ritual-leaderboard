@@ -1,63 +1,110 @@
-// Mengambil elemen-elemen dari HTML
-const analyzeBtn = document.getElementById('analyzeBtn');
-const walletInput = document.getElementById('walletInput');
-const resultSection = document.getElementById('resultSection');
-const displayWallet = document.getElementById('displayWallet');
+const RPC = "https://rpc.ritualfoundation.org";
+const provider = new ethers.providers.JsonRpcProvider(RPC);
 
-// Elemen angka statistik
-const totalTx = document.getElementById('totalTx');
-const walletBalance = document.getElementById('walletBalance');
-const activeDays = document.getElementById('activeDays');
-const activeMonths = document.getElementById('activeMonths');
-const lastActive = document.getElementById('lastActive');
+let leaderboard = [];
+let userAddress = null;
 
-// Fungsi saat tombol Analyze diklik
-analyzeBtn.addEventListener('click', () => {
-    const address = walletInput.value.trim();
+// ambil block + tx
+async function loadLeaderboard() {
+  leaderboard = [];
 
-    // Cek apakah input kosong
-    if (address === "") {
-        alert("Masukkan alamat wallet terlebih dahulu!");
-        return;
-    }
+  const latest = await provider.getBlockNumber();
 
-    // Ubah teks tombol jadi loading
-    analyzeBtn.innerHTML = "⏳ Analyzing...";
-    analyzeBtn.style.opacity = "0.7";
+  let map = {};
 
-    // Simulasi jeda waktu (seolah-olah sedang mencari data di blockchain)
-    setTimeout(() => {
-        // Tampilkan area hasil
-        resultSection.classList.remove('hidden');
-        
-        // Tampilkan alamat dompet
-        displayWallet.textContent = address;
+  // scan last 30 block (biar ringan dulu)
+  for (let i = 0; i < 30; i++) {
+    const block = await provider.getBlockWithTransactions(latest - i);
 
-        // --- SIMULASI DATA ---
-        // Karena belum ada API asli, kita hasilkan angka acak agar terlihat berfungsi
-        const randomTx = Math.floor(Math.random() * 300) + 10;
-        const randomBalance = (Math.random() * 5).toFixed(3); // 3 angka di belakang koma
-        const randomDays = Math.floor(Math.random() * 30) + 1;
-        
-        // Masukkan angka ke layar
-        totalTx.textContent = randomTx;
-        walletBalance.innerHTML = `${randomBalance} <span class="currency">RITUAL</span>`;
-        activeDays.textContent = randomDays;
-        activeMonths.textContent = Math.ceil(randomDays / 30);
-        lastActive.textContent = "1 min ago";
-
-        // Kembalikan tombol ke semula
-        analyzeBtn.innerHTML = "🔥 Analyze Wallet";
-        analyzeBtn.style.opacity = "1";
-    }, 1500); // Jeda 1.5 detik
-});
-
-// Fitur Copy Address
-document.querySelector('.copy-btn').addEventListener('click', () => {
-    const addressToCopy = displayWallet.textContent;
-    navigator.clipboard.writeText(addressToCopy).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = "Copied!";
-        setTimeout(() => btn.textContent = "Copy", 2000);
+    block.transactions.forEach(tx => {
+      const addr = tx.from.toLowerCase();
+      map[addr] = (map[addr] || 0) + 1;
     });
-});
+  }
+
+  // convert ke array
+  leaderboard = Object.entries(map).map(([wallet, tx]) => ({
+    wallet,
+    tx
+  }));
+
+  leaderboard.sort((a, b) => b.tx - a.tx);
+
+  render();
+}
+
+// connect wallet
+async function connectWallet() {
+  if (!window.ethereum) return alert("install metamask");
+
+  const accounts = await window.ethereum.request({
+    method: "eth_requestAccounts"
+  });
+
+  userAddress = accounts[0].toLowerCase();
+
+  render();
+}
+
+// render UI
+function render() {
+  const list = document.getElementById("leaderboard");
+  const userBox = document.getElementById("user");
+
+  list.innerHTML = "";
+
+  let userRank = leaderboard.findIndex(
+    x => x.wallet === userAddress
+  );
+
+  // kalau user ga ada → rank terakhir
+  if (userAddress && userRank === -1) {
+    userRank = leaderboard.length;
+  }
+
+  // tampil user
+  if (userAddress) {
+    let tx = 0;
+
+    const found = leaderboard.find(x => x.wallet === userAddress);
+    if (found) tx = found.tx;
+
+    userBox.innerHTML = `
+      <h3>Your Rank</h3>
+      <p>${short(userAddress)} (You)</p>
+      <p>Rank: #${userRank + 1}</p>
+      <p>TX: ${tx}</p>
+    `;
+  }
+
+  // tampil leaderboard
+  leaderboard.slice(0, 50).forEach((item, index) => {
+    const li = document.createElement("li");
+
+    const isYou = item.wallet === userAddress;
+
+    li.innerHTML = `
+      #${index + 1} 
+      <a href="https://explorer.ritualfoundation.org/address/${item.wallet}" target="_blank">
+        ${short(item.wallet)}
+      </a>
+      - ${item.tx} tx
+      ${isYou ? "(You)" : ""}
+    `;
+
+    if (isYou) li.classList.add("you");
+
+    list.appendChild(li);
+  });
+}
+
+// helper shorten wallet
+function short(addr) {
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
+
+// auto load
+loadLeaderboard();
+
+// refresh tiap 10 detik
+setInterval(loadLeaderboard, 10000);

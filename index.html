@@ -7,17 +7,25 @@
 </head>
 <body>
 
-  <h1>Ritual Leaderboard</h1>
+<h1>Ritual Leaderboard</h1>
 
-  <button onclick="connectWallet()">Connect Wallet</button>
+<button onclick="connectWallet()">Connect Wallet</button>
 
-  <div id="user"></div>
+<div id="user"></div>
 
-  <h2>Top Active Wallets</h2>
-  <ul id="leaderboard"></ul>
+<hr>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <script src="script.js"></script>
+<h3>Tambah Wallet Manual</h3>
+<input id="walletInput" placeholder="0x..." />
+<button onclick="addWallet()">Add Wallet</button>
+
+<ul id="walletList"></ul>
+
+<h2>Leaderboard</h2>
+<ul id="leaderboard"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

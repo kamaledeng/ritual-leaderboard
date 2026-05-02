@@ -1,10 +1,8 @@
 let data = [];
-let faucetPool = 100000; // total faucet global
+let faucetPool = 100000;
 
-// 🔥 Generate Data
+// 🔥 generate sekali saja
 function generateData(n = 200) {
-  data = [];
-
   for (let i = 0; i < n; i++) {
     let tx = Math.floor(Math.random() * 120) + 1;
     let claims = Math.floor(Math.random() * 10);
@@ -21,7 +19,7 @@ function generateData(n = 200) {
   data.sort((a, b) => b.score - a.score);
 }
 
-// 🔥 Helpers
+// 🔥 helpers
 const xpOf = s => s * 10;
 
 function levelOf(xp) {
@@ -30,29 +28,25 @@ function levelOf(xp) {
   return "Ritual Elite";
 }
 
-// 🔥 Stats Global
+// 🔥 stats
 function renderStats() {
   document.getElementById("participants").innerText = data.length * 10 + "+";
 
   let totalTx = data.reduce((a, b) => a + b.tx, 0);
   let totalClaims = data.reduce((a, b) => a + b.claims, 0);
-
   let faucetLeft = faucetPool - totalClaims * 10;
 
-  document.getElementById("totalTx").innerText = totalTx.toLocaleString();
-  document.getElementById("totalClaims").innerText = totalClaims.toLocaleString();
-  document.getElementById("faucetLeft").innerText = faucetLeft.toLocaleString();
+  document.getElementById("totalTx").innerText = totalTx;
+  document.getElementById("totalClaims").innerText = totalClaims;
+  document.getElementById("faucetLeft").innerText = faucetLeft;
 }
 
-// 🔥 Render Table
+// 🔥 render table
 function renderTable() {
   let tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
 
   data.forEach((d, i) => {
-    let xp = xpOf(d.score);
-    let lvl = levelOf(xp);
-
     tbody.innerHTML += `
       <tr>
         <td>#${i + 1}</td>
@@ -62,8 +56,8 @@ function renderTable() {
           </a>
         </td>
         <td>${d.score}</td>
-        <td>${xp}</td>
-        <td>${lvl}</td>
+        <td>${xpOf(d.score)}</td>
+        <td>${levelOf(xpOf(d.score))}</td>
         <td>${d.tx}</td>
         <td>${d.claims}</td>
       </tr>
@@ -71,25 +65,20 @@ function renderTable() {
   });
 }
 
-// 🔥 Your Rank
+// 🔥 tampil rank (TIDAK RANDOM LAGI)
 function showYourRank(user, rank, isNew = false) {
   let xp = xpOf(user.score);
-  let lvl = levelOf(xp);
 
   document.getElementById("yr-result").innerHTML = `
     <div>${user.wallet.slice(0,6)}...${user.wallet.slice(-4)}</div>
     <div class="rank-big">#${rank}</div>
-    <div>
-      Score: ${user.score} • XP: ${xp} • Level: ${lvl}
-    </div>
-    <div>
-      Tx: ${user.tx} • Faucet Claims: ${user.claims}
-    </div>
-    ${isNew ? `<div class="muted">New Participant 🚀</div>` : ``}
+    <div>Score: ${user.score} • XP: ${xp} • Level: ${levelOf(xp)}</div>
+    <div>Tx: ${user.tx} • Faucet Claims: ${user.claims}</div>
+    ${isNew ? `<div class="muted">New Participant 🚀</div>` : ""}
   `;
 }
 
-// 🔥 Check Rank
+// 🔥 CHECK RANK (STABIL)
 function checkRank() {
   let input = document.getElementById("walletInput").value.trim().toLowerCase();
 
@@ -100,40 +89,56 @@ function checkRank() {
   if (idx !== -1) {
     showYourRank(data[idx], idx + 1);
   } else {
-    let tx = Math.floor(Math.random() * 10);
-    let claims = Math.floor(Math.random() * 3);
+    // 🔥 IMPORTANT: simpan user baru biar tidak berubah-ubah
+    let tx = 5;
+    let claims = 1;
     let score = tx * 2 + claims * 5;
 
-    let fakeRank = data.length + Math.floor(Math.random() * 1000);
-
-    showYourRank({
+    let newUser = {
       wallet: input,
       tx,
       claims,
       score
-    }, fakeRank, true);
+    };
+
+    data.push(newUser);
+    data.sort((a, b) => b.score - a.score);
+
+    let newIndex = data.findIndex(d => d.wallet === input);
+
+    showYourRank(newUser, newIndex + 1, true);
+    renderTable();
+    renderStats();
   }
 }
 
-// 🔥 Connect Wallet
+// 🔥 CONNECT WALLET (FIX)
 async function connectWallet() {
-  if (!window.ethereum) {
-    alert("Install MetaMask");
+  if (typeof window.ethereum === "undefined") {
+    alert("Install MetaMask dulu");
     return;
   }
 
-  let acc = await window.ethereum.request({ method: "eth_requestAccounts" });
-  let wallet = acc[0];
+  try {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts"
+    });
 
-  document.getElementById("walletAddress").innerText =
-    "Connected: " + wallet.slice(0,6) + "...";
+    const wallet = accounts[0];
 
-  document.getElementById("walletInput").value = wallet;
+    document.getElementById("walletAddress").innerText =
+      "Connected: " + wallet.slice(0,6) + "...";
 
-  checkRank();
+    document.getElementById("walletInput").value = wallet;
+
+    checkRank();
+
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-// 🚀 INIT
+// 🔥 INIT
 generateData();
 renderStats();
 renderTable();

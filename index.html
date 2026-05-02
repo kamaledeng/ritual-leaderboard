@@ -19,6 +19,10 @@
             --modal-overlay: rgba(11, 14, 20, 0.85);
         }
 
+        html {
+            scroll-behavior: smooth; /* Efek scroll halus */
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -32,7 +36,7 @@
             padding-bottom: 50px;
         }
 
-        /* Navbar & Watermark (!kamalz) */
+        /* Navbar & Navigation Links */
         .navbar {
             width: 100%;
             padding: 15px 0;
@@ -54,22 +58,37 @@
             align-items: center;
         }
 
-        .watermark-circle {
-            width: 45px;
-            height: 45px;
-            border: 2px solid var(--accent-ritual);
-            border-radius: 50%;
+        /* Desain Menu Navigasi Atas */
+        .nav-links {
             display: flex;
-            justify-content: center;
+            gap: 30px;
             align-items: center;
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
         }
 
-        .watermark-circle span {
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
             color: var(--text-main);
-            font-weight: 700;
-            font-size: 10px;
-            letter-spacing: 0.5px;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .connect-btn {
@@ -97,15 +116,15 @@
             background-color: var(--bg-card); border: 1px solid var(--border-color);
             border-radius: 16px; padding: 30px; margin-bottom: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); position: relative; overflow: hidden;
+            scroll-margin-top: 100px; /* Jarak scroll agar tidak tertutup navbar */
         }
         .card-header { margin-bottom: 25px; }
         .card-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px;}
         .card-subtitle { color: var(--text-muted); font-size: 14px; margin: 0; }
 
         /* Profile Section */
-        .profile-content { display: none; } /* Hidden by default */
+        .profile-content { display: none; }
         .profile-content.active { display: block; animation: fadeIn 0.5s ease; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .wallet-display {
@@ -114,15 +133,8 @@
             color: var(--accent-green); margin-bottom: 20px; display: inline-block;
         }
 
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
-        }
-        
-        .stat-box {
-            background-color: var(--bg-main); border: 1px solid var(--border-color);
-            padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
-        }
-        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-box { background-color: var(--bg-main); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; display: flex; flex-direction: column; }
         .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
         .stat-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
         .token-symbol { font-size: 14px; color: var(--accent-ritual); margin-left: 5px; }
@@ -184,9 +196,26 @@
     <!-- Navbar -->
     <div class="navbar">
         <div class="nav-container">
-            <div class="watermark-circle">
-                <span>!kamalz</span>
+            
+            <!-- Menu Navigasi Baru -->
+            <div class="nav-links">
+                <a href="#profile-section" class="nav-item active" id="navProfile">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Profile
+                </a>
+                <a href="#leaderboard-section" class="nav-item" id="navLeaderboard">
+                    <svg viewBox="0 0 24 24">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    Leaderboard
+                </a>
             </div>
+
             <button id="navConnectBtn" class="connect-btn">Connect Wallet</button>
         </div>
     </div>
@@ -209,7 +238,7 @@
     <div class="container">
 
         <!-- 1. MY PROFILE SECTION -->
-        <div class="card">
+        <div class="card" id="profile-section">
             <div class="card-header">
                 <h2 class="card-title">👤 My Profile</h2>
                 <p class="card-subtitle">Your personal testnet statistics and faucet usage.</p>
@@ -240,7 +269,7 @@
         </div>
 
         <!-- 2. GLOBAL LEADERBOARD SECTION -->
-        <div class="card">
+        <div class="card" id="leaderboard-section">
             <div class="card-header">
                 <h2 class="card-title">🏆 Global Leaderboard</h2>
                 <p class="card-subtitle">Ranking of all testnet users based on total transactions.</p>
@@ -266,19 +295,32 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
+        // --- LOGIKA MENU NAVIGASI ---
+        const navProfile = document.getElementById('navProfile');
+        const navLeaderboard = document.getElementById('navLeaderboard');
+
+        // Mengubah warna ikon menjadi putih/aktif saat diklik
+        navProfile.addEventListener('click', () => {
+            navProfile.classList.add('active');
+            navLeaderboard.classList.remove('active');
+        });
+
+        navLeaderboard.addEventListener('click', () => {
+            navLeaderboard.classList.add('active');
+            navProfile.classList.remove('active');
+        });
+
         // --- LOGIKA MULTI-WALLET & PROFILE ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
         
-        // Elemen Profile
         const disconnectedState = document.getElementById('disconnectedState');
         const connectedState = document.getElementById('connectedState');
         const profileAddress = document.getElementById('profileAddress');
         const profileTxs = document.getElementById('profileTxs');
         const profileFaucet = document.getElementById('profileFaucet');
 
-        // Buka/Tutup Modal
         navConnectBtn.addEventListener('click', () => {
             if (!navConnectBtn.classList.contains('connected')) {
                 walletModal.classList.add('active');
@@ -286,7 +328,6 @@
         });
         closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
-        // Fungsi Koneksi
         async function connectEVMWallet(walletName) {
             if (typeof window.ethereum !== 'undefined') {
                 try {
@@ -295,14 +336,10 @@
                     
                     const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
                     
-                    // Update Tombol Navigasi
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
                     
-                    // Load Data Profil Pribadi
                     loadUserProfile(account);
-                    
-                    // Tutup Modal
                     walletModal.classList.remove('active');
                 } catch (error) {
                     console.error("Koneksi dibatalkan:", error);
@@ -312,17 +349,12 @@
             }
         }
 
-        // Fungsi Menampilkan Profil Akurat (Simulasi API)
         function loadUserProfile(address) {
-            // Sembunyikan state terkunci, tampilkan state profil
             disconnectedState.classList.add('hidden');
             connectedState.classList.add('active');
             
-            // Set Alamat Lengkap
             profileAddress.textContent = address;
 
-            // Simulasi penarikan data akurat dari blockchain untuk dompet tersebut
-            // Angka digenerate secara acak untuk contoh, jika ada API asli tinggal diubah di sini
             const simulatedTxs = Math.floor(Math.random() * 500) + 50;
             const simulatedFaucet = (Math.random() * 200 + 10).toFixed(2);
 
@@ -330,9 +362,7 @@
             profileFaucet.innerHTML = `${simulatedFaucet}<span class="token-symbol">RITUAL</span>`;
         }
 
-
         // --- LOGIKA DATA LEADERBOARD GLOBAL ---
-        // Data Global Semua Pengguna Testnet
         const globalLeaderboardData = [
             { wallet: "0x1a2b890c...3c4df1", txs: 24500 },
             { wallet: "0x9f8e432a...7d6ca9", txs: 18320 },
@@ -346,7 +376,6 @@
             { wallet: "0x99887766...ddeeff", txs: 3900 }
         ];
 
-        // Fungsi render tabel
         function renderLeaderboard() {
             const tableBody = document.getElementById('leaderboardBody');
             tableBody.innerHTML = ''; 
@@ -362,7 +391,6 @@
             });
         }
         
-        // Render tabel saat halaman dibuka
         renderLeaderboard();
     </script>
 </body>

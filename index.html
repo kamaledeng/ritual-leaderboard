@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ritual Activity Leaderboard</title>
+  <title>Ritual Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>Ritual Activity Leaderboard</h1>
-<p class="sub">Based on last 20 blocks</p>
+<p class="sub">Live activity (last 20 blocks)</p>
 
 <div class="box">
-  <input id="walletInput" placeholder="0x..." />
-  <button onclick="addWallet()">Add Wallet</button>
+  <input id="walletInput" placeholder="Enter wallet address (0x...)" />
+  <button onclick="addWallet()">Add</button>
 </div>
 
-<h3>Your Wallets</h3>
-<ul id="walletList"></ul>
+<p id="count"></p>
 
-<h3>Your Stats</h3>
+<div id="empty"></div>
+
+<h2>Your Wallets</h2>
 <div id="stats"></div>
 
 <h2>Leaderboard</h2>
-<p id="loading">Loading leaderboard...</p>
+<p id="loading">Loading...</p>
 <ul id="leaderboard"></ul>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>

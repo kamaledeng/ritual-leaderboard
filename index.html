@@ -6,84 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-
-  <style>
-    body {
-      background: #020617;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding: 40px;
-    }
-
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      background: #6366f1;
-      color: white;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .card {
-      background: #0f172a;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h1>Ritual Wallet Checker</h1>
+<h1>Ritual Testnet Dashboard</h1>
 
 <button onclick="connectWallet()">Connect Wallet</button>
 
 <div class="card">
   <p id="wallet">Not connected</p>
   <h2 id="balance">-</h2>
+  <p id="status"></p>
 </div>
 
-<script>
-async function connectWallet() {
-  // 🔥 cek metamask
-  if (!window.ethereum) {
-    alert("MetaMask belum install");
-    return;
-  }
-
-  try {
-    // 🔥 connect
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts"
-    });
-
-    const wallet = accounts[0];
-
-    document.getElementById("wallet").innerText = wallet;
-
-    // 🔥 ambil balance (RPC Ritual)
-    const provider = new ethers.providers.JsonRpcProvider(
-      "https://rpc.ritualfoundation.org"
-    );
-
-    const balance = await provider.getBalance(wallet);
-
-    const eth = ethers.utils.formatEther(balance);
-
-    document.getElementById("balance").innerText =
-      parseFloat(eth).toFixed(4) + " RITUAL";
-
-  } catch (err) {
-    console.log(err);
-    alert("Connect gagal");
-  }
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>

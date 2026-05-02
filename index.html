@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ritual Faucet & Leaderboard</title>
+    <title>Ritual Dashboard & Leaderboard</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -32,7 +32,7 @@
             padding-bottom: 50px;
         }
 
-        /* Navbar & Watermark */
+        /* Navbar & Watermark (!kamalz) */
         .navbar {
             width: 100%;
             padding: 15px 0;
@@ -84,66 +84,56 @@
             transition: all 0.2s;
         }
 
-        .connect-btn:hover {
-            background-color: var(--accent-ritual);
-            color: #fff;
-        }
-
+        .connect-btn:hover { background-color: var(--accent-ritual); color: #fff; }
         .connect-btn.connected {
-            background-color: var(--bg-main);
-            border-color: var(--border-color);
-            color: var(--text-main);
-            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-main); border-color: var(--border-color);
+            color: var(--text-main); font-family: 'JetBrains Mono', monospace;
         }
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-        }
+        .container { width: 90%; max-width: 900px; }
 
-        /* Desain Kartu (Cards) */
+        /* General Card Design */
         .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 30px; margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); position: relative; overflow: hidden;
         }
-
         .card-header { margin-bottom: 25px; }
-        .card-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; }
+        .card-title { font-size: 20px; font-weight: 600; margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px;}
         .card-subtitle { color: var(--text-muted); font-size: 14px; margin: 0; }
 
-        /* Faucet Input */
-        .faucet-box { display: flex; gap: 15px; }
-        .faucet-input-wrapper { flex: 1; }
-        .faucet-input {
-            width: 100%;
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px 20px;
-            color: var(--text-main);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.2s;
+        /* Profile Section */
+        .profile-content { display: none; } /* Hidden by default */
+        .profile-content.active { display: block; animation: fadeIn 0.5s ease; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .wallet-display {
+            background-color: var(--bg-main); border: 1px solid var(--border-color);
+            padding: 15px 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-green); margin-bottom: 20px; display: inline-block;
         }
-        .faucet-input:focus { border-color: var(--accent-ritual); }
-        .claim-btn {
-            background-color: var(--accent-ritual);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 0 30px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
         }
-        .claim-btn:hover { background-color: #7c3aed; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+        
+        .stat-box {
+            background-color: var(--bg-main); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
+        }
+        
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .stat-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
+        .token-symbol { font-size: 14px; color: var(--accent-ritual); margin-left: 5px; }
+
+        /* Disconnected State Overlay */
+        .disconnected-overlay {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px 0; text-align: center;
+        }
+        .disconnected-overlay.hidden { display: none; }
+        .lock-icon { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
 
         /* Leaderboard Table */
         .table-container { overflow-x: auto; }
@@ -159,26 +149,20 @@
         tr:nth-child(2) .rank-badge { background-color: rgba(156, 163, 175, 0.1); color: #9CA3AF; }
         tr:nth-child(3) .rank-badge { background-color: rgba(180, 83, 9, 0.1); color: #B45309; }
         .wallet-address { font-family: 'JetBrains Mono', monospace; color: var(--text-main); }
-        .token-amount { font-weight: 600; color: var(--accent-green); }
-        .tx-count { color: var(--text-muted); font-size: 13px; }
+        .tx-count { font-weight: 600; color: var(--accent-green); font-size: 15px; }
 
-        /* MODAL MULTI-WALLET */
+        /* MODAL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--modal-overlay);
-            backdrop-filter: blur(5px);
+            background-color: var(--modal-overlay); backdrop-filter: blur(5px);
             display: flex; justify-content: center; align-items: center;
-            z-index: 999;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
+            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px; width: 90%; max-width: 360px;
-            padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transform: translateY(20px); transition: transform 0.3s ease;
+            background-color: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; width: 90%; max-width: 360px; padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s ease;
         }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -189,8 +173,7 @@
             width: 100%; display: flex; align-items: center; justify-content: space-between;
             background-color: var(--bg-main); border: 1px solid var(--border-color);
             padding: 15px 20px; border-radius: 12px; margin-bottom: 10px;
-            color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer;
-            transition: all 0.2s;
+            color: var(--text-main); font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.2s;
         }
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
         .wallet-icon { font-size: 20px; }
@@ -212,48 +195,55 @@
     <div id="walletModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Connect a Wallet</h3>
+                <h3>Connect Wallet</h3>
                 <button id="closeModal" class="close-modal">&times;</button>
             </div>
             <div class="wallet-list">
-                <button class="wallet-option" onclick="connectEVMWallet('MetaMask')">
-                    <span>MetaMask</span> <span class="wallet-icon">🦊</span>
-                </button>
-                <button class="wallet-option" onclick="connectEVMWallet('Rabby')">
-                    <span>Rabby Wallet</span> <span class="wallet-icon">🐰</span>
-                </button>
-                <button class="wallet-option" onclick="connectEVMWallet('Coinbase')">
-                    <span>Coinbase Wallet</span> <span class="wallet-icon">🔵</span>
-                </button>
-                <button class="wallet-option" onclick="connectEVMWallet('WalletConnect')">
-                    <span>WalletConnect</span> <span class="wallet-icon">🔗</span>
-                </button>
+                <button class="wallet-option" onclick="connectEVMWallet('MetaMask')"><span>MetaMask</span> <span class="wallet-icon">🦊</span></button>
+                <button class="wallet-option" onclick="connectEVMWallet('Rabby')"><span>Rabby Wallet</span> <span class="wallet-icon">🐰</span></button>
+                <button class="wallet-option" onclick="connectEVMWallet('Coinbase')"><span>Coinbase Wallet</span> <span class="wallet-icon">🔵</span></button>
             </div>
         </div>
     </div>
 
     <div class="container">
-        
-        <!-- Faucet Section -->
+
+        <!-- 1. MY PROFILE SECTION -->
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">💧 Ritual Testnet Faucet</h2>
-                <p class="card-subtitle">Claim testnet tokens to interact with the DeAI coprocessor network.</p>
+                <h2 class="card-title">👤 My Profile</h2>
+                <p class="card-subtitle">Your personal testnet statistics and faucet usage.</p>
             </div>
-            
-            <div class="faucet-box">
-                <div class="faucet-input-wrapper">
-                    <input type="text" id="walletInput" class="faucet-input" placeholder="Enter your 0x... address or Connect Wallet">
+
+            <!-- Jika Belum Connect -->
+            <div id="disconnectedState" class="disconnected-overlay">
+                <div class="lock-icon">🔒</div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Please connect your wallet to view your personal testnet data.</p>
+                <button class="connect-btn" onclick="document.getElementById('walletModal').classList.add('active')">Connect to View</button>
+            </div>
+
+            <!-- Jika Sudah Connect -->
+            <div id="connectedState" class="profile-content">
+                <div class="wallet-display" id="profileAddress">0x...</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="profileTxs">0</div>
+                        <div class="stat-label">Total Transactions</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="profileFaucet">0<span class="token-symbol">RITUAL</span></div>
+                        <div class="stat-label">Total Faucet Used</div>
+                    </div>
                 </div>
-                <button id="claimBtn" class="claim-btn">Claim Tokens</button>
             </div>
         </div>
 
-        <!-- Leaderboard Section -->
+        <!-- 2. GLOBAL LEADERBOARD SECTION -->
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">🏆 Top Testers Leaderboard</h2>
-                <p class="card-subtitle">Ranked by testnet interactions and faucet claims.</p>
+                <h2 class="card-title">🏆 Global Leaderboard</h2>
+                <p class="card-subtitle">Ranking of all testnet users based on total transactions.</p>
             </div>
 
             <div class="table-container">
@@ -262,12 +252,11 @@
                         <tr>
                             <th>Rank</th>
                             <th>Wallet Address</th>
-                            <th>Total Faucet Claimed</th>
-                            <th>Network Txs</th>
+                            <th>Total Transactions</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboardBody">
-                        <!-- Data Leaderboard -->
+                        <!-- Data akan di-inject oleh JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -277,11 +266,17 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        // --- LOGIKA MULTI-WALLET ---
+        // --- LOGIKA MULTI-WALLET & PROFILE ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
-        const walletInput = document.getElementById('walletInput');
+        
+        // Elemen Profile
+        const disconnectedState = document.getElementById('disconnectedState');
+        const connectedState = document.getElementById('connectedState');
+        const profileAddress = document.getElementById('profileAddress');
+        const profileTxs = document.getElementById('profileTxs');
+        const profileFaucet = document.getElementById('profileFaucet');
 
         // Buka/Tutup Modal
         navConnectBtn.addEventListener('click', () => {
@@ -291,79 +286,83 @@
         });
         closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
-        // Fungsi Koneksi Wallet
+        // Fungsi Koneksi
         async function connectEVMWallet(walletName) {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // Meminta akses ke wallet extension yang aktif (MetaMask/Rabby/dsb)
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     const account = accounts[0];
                     
-                    // Singkat alamat untuk tombol
                     const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
                     
                     // Update Tombol Navigasi
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
                     
-                    // OTOMATIS ISI INPUT FAUCET
-                    walletInput.value = account;
+                    // Load Data Profil Pribadi
+                    loadUserProfile(account);
                     
                     // Tutup Modal
                     walletModal.classList.remove('active');
                 } catch (error) {
-                    console.error(error);
+                    console.error("Koneksi dibatalkan:", error);
                 }
             } else {
-                alert(`Tolong install ekstensi ${walletName} atau wallet Web3 lainnya di browser Anda!`);
+                alert(`Tolong install ekstensi ${walletName} atau wallet Web3 lainnya!`);
             }
         }
 
-        // --- LOGIKA FAUCET ---
-        const claimBtn = document.getElementById('claimBtn');
-        claimBtn.addEventListener('click', () => {
-            const address = walletInput.value.trim();
-            if (address === "" || !address.startsWith("0x")) {
-                alert("Masukkan alamat wallet Web3 yang valid (berawalan 0x)!"); return;
-            }
-            claimBtn.textContent = "Processing...";
-            claimBtn.style.opacity = "0.7";
-            claimBtn.disabled = true;
+        // Fungsi Menampilkan Profil Akurat (Simulasi API)
+        function loadUserProfile(address) {
+            // Sembunyikan state terkunci, tampilkan state profil
+            disconnectedState.classList.add('hidden');
+            connectedState.classList.add('active');
+            
+            // Set Alamat Lengkap
+            profileAddress.textContent = address;
 
-            setTimeout(() => {
-                alert(`Sukses! Token Testnet Ritual telah dikirim ke ${address.substring(0,6)}...`);
-                claimBtn.textContent = "Claimed!";
-                claimBtn.style.backgroundColor = "var(--accent-green)";
-                setTimeout(() => {
-                    claimBtn.textContent = "Claim Tokens";
-                    claimBtn.style.backgroundColor = "var(--accent-ritual)";
-                    claimBtn.disabled = false;
-                }, 3000);
-            }, 1500);
-        });
+            // Simulasi penarikan data akurat dari blockchain untuk dompet tersebut
+            // Angka digenerate secara acak untuk contoh, jika ada API asli tinggal diubah di sini
+            const simulatedTxs = Math.floor(Math.random() * 500) + 50;
+            const simulatedFaucet = (Math.random() * 200 + 10).toFixed(2);
 
-        // --- LOGIKA LEADERBOARD ---
-        const dummyData = [
-            { wallet: "0x1a2b890c...3c4df1", tokens: "450.00", txs: 1420 },
-            { wallet: "0x9f8e432a...7d6ca9", tokens: "380.50", txs: 1105 },
-            { wallet: "0x5b6a778b...1f2eb3", tokens: "310.00", txs: 980 },
-            { wallet: "0x4c3d112e...8b9ac4", tokens: "295.20", txs: 840 },
-            { wallet: "0x7e6f554c...2a1bd7", tokens: "210.00", txs: 620 }
+            profileTxs.textContent = simulatedTxs.toLocaleString();
+            profileFaucet.innerHTML = `${simulatedFaucet}<span class="token-symbol">RITUAL</span>`;
+        }
+
+
+        // --- LOGIKA DATA LEADERBOARD GLOBAL ---
+        // Data Global Semua Pengguna Testnet
+        const globalLeaderboardData = [
+            { wallet: "0x1a2b890c...3c4df1", txs: 24500 },
+            { wallet: "0x9f8e432a...7d6ca9", txs: 18320 },
+            { wallet: "0x5b6a778b...1f2eb3", txs: 15400 },
+            { wallet: "0x4c3d112e...8b9ac4", txs: 12105 },
+            { wallet: "0x7e6f554c...2a1bd7", txs: 9840 },
+            { wallet: "0x2b4c998d...1a2be5", txs: 7650 },
+            { wallet: "0x8a9b332f...4c5df8", txs: 6100 },
+            { wallet: "0x3d4e556f...7b8c9d", txs: 5430 },
+            { wallet: "0x11223344...aabbcc", txs: 4120 },
+            { wallet: "0x99887766...ddeeff", txs: 3900 }
         ];
 
+        // Fungsi render tabel
         function renderLeaderboard() {
             const tableBody = document.getElementById('leaderboardBody');
-            dummyData.forEach((user, index) => {
+            tableBody.innerHTML = ''; 
+
+            globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><span class="rank-badge">${index + 1}</span></td>
                     <td><span class="wallet-address">${user.wallet}</span></td>
-                    <td><span class="token-amount">${user.tokens} RITUAL</span></td>
-                    <td><span class="tx-count">${user.txs.toLocaleString()} txs</span></td>
+                    <td><span class="tx-count">${user.txs.toLocaleString()} TXs</span></td>
                 `;
                 tableBody.appendChild(row);
             });
         }
+        
+        // Render tabel saat halaman dibuka
         renderLeaderboard();
     </script>
 </body>

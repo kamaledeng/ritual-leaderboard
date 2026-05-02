@@ -50,3 +50,8 @@ function checkRank() {
     `;
   }
 }
+function getLevel(xp) {
+  if (xp < 500) return "Newbie";
+  if (xp < 1500) return "Explorer";
+  return "Ritual Elite";
+}

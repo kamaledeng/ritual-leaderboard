@@ -8,23 +8,44 @@
 
   <style>
     body {
-      background: #0f172a;
-      color: white;
+      background: #0b1220;
+      color: #e5e7eb;
       font-family: Arial;
-      text-align: center;
+      margin: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
     }
 
     h1 {
-      margin-top: 30px;
+      font-size: 28px;
     }
 
-    .box {
-      margin: 20px;
+    .card {
+      background: #111827;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    .rank-box {
+      background: #1f2937;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 28px;
+      text-align: center;
+      margin-top: 10px;
     }
 
     input {
       padding: 10px;
-      width: 260px;
+      width: 70%;
+      border-radius: 6px;
+      border: none;
     }
 
     button {
@@ -36,23 +57,15 @@
       cursor: pointer;
     }
 
-    .card {
-      background: #1e293b;
-      padding: 10px;
-      margin: 10px auto;
-      border-radius: 8px;
-      width: 300px;
-    }
-
     table {
-      width: 90%;
-      margin: 20px auto;
+      width: 100%;
+      margin-top: 20px;
       border-collapse: collapse;
     }
 
     th, td {
-      padding: 10px;
-      border-bottom: 1px solid #1e293b;
+      padding: 12px;
+      border-bottom: 1px solid #1f2937;
     }
 
     a {
@@ -66,41 +79,46 @@
     }
 
     .sub {
-      color: #94a3b8;
+      color: #9ca3af;
     }
   </style>
 </head>
 
 <body>
 
-<h1>Ritual Activity Leaderboard</h1>
-<p class="sub">Live (last 20 blocks)</p>
+<div class="container">
 
-<div class="box">
+<h1>⚡ Ritual Leaderboard</h1>
+<p class="sub">Based on last 20 blocks</p>
+
+<div class="card">
   <input id="walletInput" placeholder="Enter wallet (0x...)" />
   <button onclick="addWallet()">Add</button>
 </div>
 
-<p id="count"></p>
-<p id="empty"></p>
+<div class="card">
+  <h3>Your Rank</h3>
+  <div id="yourRank">-</div>
+  <div class="rank-box" id="rankBox">#-</div>
+</div>
 
-<h2>Your Wallets</h2>
-<div id="stats"></div>
+<div class="card">
+  <h3>Leaderboard</h3>
+  <p id="loading">Loading...</p>
 
-<h2>Leaderboard</h2>
-<p id="loading">Loading...</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Wallet</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody id="leaderboard"></tbody>
+  </table>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Rank</th>
-      <th>Wallet</th>
-      <th>Score</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="leaderboard"></tbody>
-</table>
+</div>
 
 <script>
 const RPC = "https://rpc.ritualfoundation.org";
@@ -110,52 +128,16 @@ let wallets = JSON.parse(localStorage.getItem("wallets") || "[]");
 let leaderboard = [];
 
 function addWallet() {
-  const input = document.getElementById("walletInput").value.trim().toLowerCase();
+  const input = document.getElementById("walletInput").value.toLowerCase();
 
-  if (!input.startsWith("0x")) {
-    alert("invalid wallet");
-    return;
-  }
+  if (!input.startsWith("0x")) return alert("invalid wallet");
 
   if (!wallets.includes(input)) {
-    wallets.push(input);
+    wallets = [input]; // fokus 1 wallet utama
     localStorage.setItem("wallets", JSON.stringify(wallets));
   }
 
   document.getElementById("walletInput").value = "";
-  renderWallets();
-}
-
-function renderWallets() {
-  const stats = document.getElementById("stats");
-  const empty = document.getElementById("empty");
-  const count = document.getElementById("count");
-
-  stats.innerHTML = "";
-  count.innerText = `Tracking ${wallets.length} wallet(s)`;
-
-  if (wallets.length === 0) {
-    empty.innerText = "Add wallet to track rank";
-    return;
-  } else {
-    empty.innerText = "";
-  }
-
-  wallets.forEach(w => {
-    let found = leaderboard.find(x => x.wallet === w);
-    let rank = leaderboard.findIndex(x => x.wallet === w);
-
-    if (rank === -1) rank = leaderboard.length;
-
-    stats.innerHTML += `
-      <div class="card">
-        ${short(w)} <br>
-        Rank: #${rank + 1} <br>
-        Score: ${found ? found.tx : 0} <br>
-        ${found ? "🔥 Active" : "💤 Idle"}
-      </div>
-    `;
-  });
 }
 
 async function load() {
@@ -181,20 +163,30 @@ async function load() {
 
     leaderboard.sort((a, b) => b.tx - a.tx);
 
-    renderLeaderboard();
-    renderWallets();
+    render();
 
-  } catch (e) {
+  } catch {
     document.getElementById("loading").innerText = "RPC error";
   }
 }
 
-function renderLeaderboard() {
+function render() {
   const table = document.getElementById("leaderboard");
   table.innerHTML = "";
 
+  let myWallet = wallets[0];
+  let myRank = leaderboard.findIndex(x => x.wallet === myWallet);
+
+  if (myRank === -1) myRank = leaderboard.length;
+
+  document.getElementById("yourRank").innerText =
+    myWallet ? short(myWallet) : "No wallet";
+
+  document.getElementById("rankBox").innerText =
+    "#" + (myRank + 1);
+
   leaderboard.slice(0, 50).forEach((item, i) => {
-    const isYou = wallets.includes(item.wallet);
+    const isYou = item.wallet === myWallet;
 
     table.innerHTML += `
       <tr class="${isYou ? "you" : ""}">
@@ -206,7 +198,6 @@ function renderLeaderboard() {
           ${isYou ? "(You)" : ""}
         </td>
         <td>${item.tx}</td>
-        <td>${item.tx > 0 ? "🔥" : "💤"}</td>
       </tr>
     `;
   });

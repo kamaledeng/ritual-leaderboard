@@ -19,8 +19,6 @@
             --modal-overlay: rgba(11, 14, 20, 0.85);
         }
 
-        html { scroll-behavior: smooth; }
-
         body {
             margin: 0; padding: 0; background-color: var(--bg-main); color: var(--text-main);
             font-family: 'Inter', sans-serif; display: flex; flex-direction: column; 
@@ -54,13 +52,16 @@
             color: var(--text-main); font-family: 'JetBrains Mono', monospace;
         }
 
-        /* --- CONTAINER & CARDS --- */
         .container { width: 90%; max-width: 900px; }
+
+        /* TAB SYSTEM: Sembunyikan Leaderboard saat awal dibuka */
+        #leaderboard-section { display: none; }
+        #profile-section { display: block; }
 
         .card {
             background-color: var(--bg-card); border: 1px solid var(--border-color);
             border-radius: 16px; padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); scroll-margin-top: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); animation: fadeIn 0.4s ease;
         }
         .card-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .card-title { font-size: 20px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 10px;}
@@ -78,7 +79,7 @@
 
         /* --- PROFILE SECTION --- */
         .profile-content { display: none; }
-        .profile-content.active { display: block; animation: fadeIn 0.5s ease; }
+        .profile-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .wallet-display {
@@ -165,7 +166,7 @@
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
     </style>
 
-    <!-- Script Ethers.js untuk Blockchain -->
+    <!-- Script Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body>
@@ -174,11 +175,12 @@
     <div class="navbar">
         <div class="nav-container">
             <div class="nav-links">
-                <a href="#profile-section" class="nav-item active" id="navProfile">
+                <!-- Navigasi menjadi tombol fungsional (Tab) -->
+                <a class="nav-item active" id="navProfile">
                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     Profile
                 </a>
-                <a href="#leaderboard-section" class="nav-item" id="navLeaderboard">
+                <a class="nav-item" id="navLeaderboard">
                     <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     Leaderboard
                 </a>
@@ -203,14 +205,14 @@
 
     <div class="container">
 
-        <!-- 3. MY PROFILE SECTION -->
+        <!-- 3. MY PROFILE SECTION (Halaman 1) -->
         <div class="card" id="profile-section">
             <div class="card-header">
                 <h2 class="card-title">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ritual)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     My Profile
                 </h2>
-                <!-- Badge Streaming Live (Muncul saat connect) -->
+                <!-- Badge Streaming Live -->
                 <div class="streaming-badge" id="liveBadge" style="display: none;">
                     <span class="pulse-circle"></span> Streaming live
                 </div>
@@ -218,26 +220,22 @@
             
             <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 30px; font-size: 14px;">Your personal testnet statistics and faucet usage.</p>
 
-            <!-- State Belum Connect -->
             <div id="disconnectedState" class="disconnected-overlay">
                 <div class="lock-icon">🔒</div>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">Please connect your wallet to view your on-chain data.</p>
                 <button class="connect-btn" onclick="document.getElementById('walletModal').classList.add('active')">Connect to View</button>
             </div>
 
-            <!-- State Sudah Connect -->
             <div id="connectedState" class="profile-content">
                 <div class="wallet-display" id="profileAddress">0x...</div>
                 
                 <div class="stats-grid">
-                    <!-- Kartu Transaksi -->
                     <div class="stat-card-custom">
                         <div class="icon-box icon-green">#</div>
                         <h2 class="stat-value" id="profileTxs">0</h2>
                         <p class="stat-label">TOTAL TRANSACTIONS</p>
                     </div>
 
-                    <!-- Kartu Balance -->
                     <div class="stat-card-custom">
                         <div class="icon-box icon-purple">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M16 12h2"></path></svg>
@@ -251,7 +249,7 @@
             </div>
         </div>
 
-        <!-- 4. GLOBAL LEADERBOARD SECTION -->
+        <!-- 4. GLOBAL LEADERBOARD SECTION (Halaman 2) -->
         <div class="card" id="leaderboard-section">
             <div class="card-header">
                 <h2 class="card-title">
@@ -262,7 +260,6 @@
             
             <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 25px; font-size: 14px;">Ranked by total interaction count with the network.</p>
 
-            <!-- FITUR SEARCH -->
             <div class="search-rank-box">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input type="text" id="rankSearchInput" placeholder="Check rank... (Paste wallet address 0x...)">
@@ -288,13 +285,27 @@
 
     <!-- 5. SCRIPT JAVASCRIPT UTAMA -->
     <script>
-        // Tab Navigasi Logic
+        // --- LOGIKA TAB MENU (Supaya tidak menumpuk atas bawah) ---
         const navProfile = document.getElementById('navProfile');
         const navLeaderboard = document.getElementById('navLeaderboard');
-        navProfile.addEventListener('click', () => { navProfile.classList.add('active'); navLeaderboard.classList.remove('active'); });
-        navLeaderboard.addEventListener('click', () => { navLeaderboard.classList.add('active'); navProfile.classList.remove('active'); });
+        const profileSection = document.getElementById('profile-section');
+        const leaderboardSection = document.getElementById('leaderboard-section');
 
-        // Wallet Logic
+        navProfile.addEventListener('click', () => { 
+            navProfile.classList.add('active'); 
+            navLeaderboard.classList.remove('active'); 
+            profileSection.style.display = 'block'; // Tampilkan Profil
+            leaderboardSection.style.display = 'none'; // Sembunyikan Leaderboard
+        });
+
+        navLeaderboard.addEventListener('click', () => { 
+            navLeaderboard.classList.add('active'); 
+            navProfile.classList.remove('active'); 
+            profileSection.style.display = 'none'; // Sembunyikan Profil
+            leaderboardSection.style.display = 'block'; // Tampilkan Leaderboard
+        });
+
+        // --- Wallet Logic ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
@@ -322,9 +333,8 @@
             } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
         }
 
-        // --- FUNGSI TARIK DATA RPC RITUAL TESTNET (AKURAT) ---
+        // --- FUNGSI TARIK DATA (MENGGUNAKAN METAMASK LANGSUNG) ---
         async function loadRealUserProfile(address) {
-            // Tampilkan UI Profile & Badge Live
             document.getElementById('disconnectedState').classList.add('hidden');
             document.getElementById('connectedState').classList.add('active');
             liveBadge.style.display = "flex"; 
@@ -334,10 +344,8 @@
                 document.getElementById('profileTxs').textContent = "...";
                 document.getElementById('profileBalance').innerHTML = `... <span class="currency">RITUAL</span>`;
 
-                // ⚠️ MEMAKSA MEMBACA DARI RPC RITUAL TESTNET ⚠️
-                // Ini memastikan data yang diambil selalu akurat tanpa peduli network MetaMask user
-                const ritualRpcUrl = "https://rpc-testnet.ritual.net"; 
-                const provider = new ethers.JsonRpcProvider(ritualRpcUrl);
+                // Menggunakan MetaMask sebagai jembatan untuk menghindari Error RPC / CORS
+                const provider = new ethers.BrowserProvider(window.ethereum);
 
                 // Tarik Jumlah Transaksi (Nonce)
                 const txCount = await provider.getTransactionCount(address);
@@ -345,16 +353,16 @@
                 // Tarik Saldo (Balance)
                 const balanceWei = await provider.getBalance(address);
                 const balanceEth = ethers.formatEther(balanceWei);
-                const formattedBalance = parseFloat(balanceEth).toFixed(3); // 3 angka di belakang koma
+                const formattedBalance = parseFloat(balanceEth).toFixed(3);
 
                 // Tampilkan ke layar
                 document.getElementById('profileTxs').textContent = txCount;
                 document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
 
             } catch (err) {
-                console.error("Gagal menarik data dari blockchain Ritual:", err);
+                console.error("Gagal menarik data dari blockchain:", err);
                 document.getElementById('profileTxs').textContent = "Error";
-                document.getElementById('profileBalance').innerHTML = `Error RPC`;
+                document.getElementById('profileBalance').innerHTML = `Error Baca Data`;
             }
         }
 
@@ -367,7 +375,7 @@
             { wallet: "0x7e6f554c22a1bd7f8e", txs: 9840 },
             { wallet: "0x2b4c998d41a2be5f6a", txs: 7650 },
             { wallet: "0x8a9b332f14c5df8e7b", txs: 6100 },
-            { wallet: "0xcf3da8d27bc354c8beb13a98205043e5c0967232", txs: 456 } // Data contoh dari gambar user
+            { wallet: "0xcf3da8d27bc354c8beb13a98205043e5c0967232", txs: 456 } 
         ];
 
         function renderLeaderboard() {

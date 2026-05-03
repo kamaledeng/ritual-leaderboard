@@ -82,7 +82,6 @@
         .profile-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Wallet Display dengan efek hover untuk copy */
         .wallet-display {
             background-color: var(--bg-main); border: 1px solid var(--border-color);
             padding: 15px 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
@@ -131,8 +130,16 @@
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { color: var(--text-muted); font-size: 12px; font-weight: 500; text-transform: uppercase; padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
-        td { padding: 18px 20px; border-bottom: 1px solid rgba(42, 50, 65, 0.5); font-size: 14px; }
+        td { padding: 18px 20px; border-bottom: 1px solid rgba(42, 50, 65, 0.5); font-size: 14px; transition: background-color 0.5s ease; }
         tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+        
+        /* Animasi KILATAN HIJAU saat angka bertambah */
+        .row-update { animation: flashGreen 1.5s ease-out; }
+        @keyframes flashGreen {
+            0% { background-color: rgba(0, 255, 136, 0.2); }
+            100% { background-color: transparent; }
+        }
+
         .rank-badge {
             display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center;
             border-radius: 6px; background-color: var(--bg-main); color: var(--text-muted); font-weight: 600; font-size: 13px;
@@ -141,15 +148,8 @@
         tr:nth-child(2) .rank-badge { background-color: rgba(156, 163, 175, 0.1); color: #9CA3AF; }
         tr:nth-child(3) .rank-badge { background-color: rgba(180, 83, 9, 0.1); color: #B45309; }
         
-        /* Desain baru agar teks dompet di tabel terlihat bisa diklik */
-        .wallet-address { 
-            font-family: 'JetBrains Mono', monospace; 
-            color: var(--text-main); 
-            cursor: pointer; 
-            transition: color 0.2s; 
-        }
+        .wallet-address { font-family: 'JetBrains Mono', monospace; color: var(--text-main); cursor: pointer; transition: color 0.2s; }
         .wallet-address:hover { color: var(--accent-green); }
-        
         .tx-count { font-weight: 600; color: var(--accent-green); font-size: 15px; }
 
         /* --- MODAL WALLET --- */
@@ -178,7 +178,6 @@
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
     </style>
 
-    <!-- Script Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body>
@@ -196,7 +195,6 @@
                     Leaderboard
                 </a>
             </div>
-            <!-- Tombol Kanan Atas -->
             <button id="navConnectBtn" class="connect-btn" title="Click to copy address">Connect Wallet</button>
         </div>
     </div>
@@ -237,7 +235,6 @@
             </div>
 
             <div id="connectedState" class="profile-content">
-                <!-- Wallet di Profile, juga bisa di-klik untuk copy -->
                 <div class="wallet-display" id="profileAddress" title="Click to copy address">0x...</div>
                 
                 <div class="stats-grid">
@@ -267,6 +264,10 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ritual)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     Global Leaderboard
                 </h2>
+                <!-- Badge Streaming Live di Leaderboard -->
+                <div class="streaming-badge">
+                    <span class="pulse-circle"></span> Live Feed
+                </div>
             </div>
             
             <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 25px; font-size: 14px;">Ranked by total interaction count with the network.</p>
@@ -296,7 +297,7 @@
 
     <!-- 5. SCRIPT JAVASCRIPT UTAMA -->
     <script>
-        // --- LOGIKA TAB MENU ---
+        // --- TAB LOGIC ---
         const navProfile = document.getElementById('navProfile');
         const navLeaderboard = document.getElementById('navLeaderboard');
         const profileSection = document.getElementById('profile-section');
@@ -312,7 +313,8 @@
             profileSection.style.display = 'none'; leaderboardSection.style.display = 'block'; 
         });
 
-        // --- DATA LEADERBOARD DUMMY ---
+        // --- GLOBAL VARIABLES ---
+        let connectedWalletAddress = "";
         let globalLeaderboardData = [
             { wallet: "0x1a2b890c93c4df1e2a", txs: 24500 },
             { wallet: "0x9f8e432a27d6ca9b5f", txs: 18320 },
@@ -320,37 +322,33 @@
             { wallet: "0x4c3d112e88b9ac4e5d", txs: 12105 },
             { wallet: "0x7e6f554c22a1bd7f8e", txs: 9840 },
             { wallet: "0x2b4c998d41a2be5f6a", txs: 7650 },
-            { wallet: "0x8a9b332f14c5df8e7b", txs: 6100 }
+            { wallet: "0x8a9b332f14c5df8e7b", txs: 6100 },
+            { wallet: "0x3d4e556f7b8c9d0a1b", txs: 5420 },
+            { wallet: "0x11223344aabbcc5566", txs: 3100 }
         ];
 
-        // --- Wallet Logic & Interaksi ---
+        // --- WALLET & COPY LOGIC ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
         const liveBadge = document.getElementById('liveBadge');
         const profileAddress = document.getElementById('profileAddress');
         
-        // LOGIKA BARU: Jika diklik saat konek, akan Copy Address
         navConnectBtn.addEventListener('click', () => {
             if (!navConnectBtn.classList.contains('connected')) {
                 walletModal.classList.add('active');
             } else {
-                // Menjalankan perintah Copy Address
                 const fullAddress = navConnectBtn.getAttribute('data-full-address');
                 if(fullAddress) {
                     navigator.clipboard.writeText(fullAddress);
                     const originalText = navConnectBtn.textContent;
                     navConnectBtn.textContent = "Copied! 📋";
                     navConnectBtn.style.color = "var(--accent-green)";
-                    setTimeout(() => {
-                        navConnectBtn.textContent = originalText;
-                        navConnectBtn.style.color = "var(--text-main)";
-                    }, 1500);
+                    setTimeout(() => { navConnectBtn.textContent = originalText; navConnectBtn.style.color = "var(--text-main)"; }, 1500);
                 }
             }
         });
 
-        // Sama untuk alamat dompet di dalam kartu profil
         profileAddress.addEventListener('click', () => {
             const fullAddress = profileAddress.getAttribute('data-full-address');
             if(fullAddress) {
@@ -363,29 +361,24 @@
 
         closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
-        // Fungsi Connect Asli via MetaMask
+        // --- CONNECT METAMASK ---
         async function connectEVMWallet() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
+                    connectedWalletAddress = accounts[0];
                     
-                    const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
+                    const shortAddress = `${connectedWalletAddress.substring(0,6)}...${connectedWalletAddress.substring(connectedWalletAddress.length-4)}`;
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
-                    
-                    // Simpan alamat lengkap di belakang layar untuk fitur copy
-                    navConnectBtn.setAttribute('data-full-address', account); 
+                    navConnectBtn.setAttribute('data-full-address', connectedWalletAddress); 
                     
                     walletModal.classList.remove('active');
-                    
-                    // Panggil data asli
-                    loadRealUserProfile(account);
+                    loadRealUserProfile(connectedWalletAddress);
                 } catch (error) { console.error("Koneksi dibatalkan:", error); }
             } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
         }
 
-        // --- TARIK DATA ASLI & SUNTIK KE LEADERBOARD ---
         async function loadRealUserProfile(address) {
             document.getElementById('disconnectedState').classList.add('hidden');
             document.getElementById('connectedState').classList.add('active');
@@ -407,7 +400,7 @@
                 document.getElementById('profileTxs').textContent = txCount;
                 document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
 
-                // Update data Leaderboard
+                // Masukkan data kita ke Leaderboard
                 globalLeaderboardData = globalLeaderboardData.filter(u => u.wallet.toLowerCase() !== address.toLowerCase());
                 globalLeaderboardData.push({ wallet: address, txs: txCount });
                 renderLeaderboard();
@@ -419,8 +412,8 @@
             }
         }
 
-        // --- RENDER LEADERBOARD (Ditambah Fitur Copy) ---
-        function renderLeaderboard() {
+        // --- RENDER LEADERBOARD ---
+        function renderLeaderboard(updatedWallet = null) {
             const tableBody = document.getElementById('leaderboardBody');
             tableBody.innerHTML = ''; 
 
@@ -428,6 +421,12 @@
 
             globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
+                
+                // Tambahkan class animasi 'row-update' jika wallet ini baru saja diupdate angkanya
+                if(updatedWallet && user.wallet === updatedWallet) {
+                    row.classList.add('row-update');
+                }
+
                 row.innerHTML = `
                     <td><span class="rank-badge">${index + 1}</span></td>
                     <td><span class="wallet-address" data-wallet="${user.wallet}" title="Click to copy">${user.wallet}</span></td>
@@ -438,7 +437,7 @@
         }
         renderLeaderboard();
 
-        // Logika agar teks dompet di tabel Leaderboard bisa diklik untuk Copy
+        // Copy dompet di Leaderboard
         document.getElementById('leaderboardBody').addEventListener('click', function(e) {
             if (e.target.classList.contains('wallet-address')) {
                 const fullWallet = e.target.getAttribute('data-wallet');
@@ -447,28 +446,48 @@
                 const originalText = e.target.textContent;
                 e.target.textContent = "Copied! ✅";
                 e.target.style.color = "var(--accent-green)";
-                
-                setTimeout(() => {
-                    e.target.textContent = originalText;
-                    e.target.style.color = ""; // Kembalikan ke warna asli
-                }, 1500);
+                setTimeout(() => { e.target.textContent = originalText; e.target.style.color = ""; }, 1500);
             }
         });
 
-        // Fitur Filter/Pencarian Rank Wallet
+        // Search Leaderboard
         document.getElementById('rankSearchInput').addEventListener('input', function(e) {
             const filterText = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('#leaderboardBody tr');
-            
             rows.forEach(row => {
                 const walletText = row.querySelector('.wallet-address').textContent.toLowerCase();
-                if(walletText.includes(filterText)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                if(walletText.includes(filterText)) { row.style.display = ''; } else { row.style.display = 'none'; }
             });
         });
+
+        // ==========================================
+        // FITUR BARU: SIMULASI LIVE NETWORK (Gerak!)
+        // ==========================================
+        setInterval(() => {
+            // Kita hanya jalankan simulasi jika Leaderboard sedang dibuka, supaya browser tidak berat
+            if (document.getElementById('leaderboard-section').style.display === 'block') {
+                
+                // Buat daftar dompet (kecuali dompet pengguna yang sedang connect agar tidak merusak data asli)
+                const otherWallets = globalLeaderboardData.filter(u => u.wallet.toLowerCase() !== connectedWalletAddress.toLowerCase());
+                
+                if (otherWallets.length > 0) {
+                    // Pilih 1 dompet secara acak
+                    const randomIndex = Math.floor(Math.random() * otherWallets.length);
+                    const randomWalletObj = otherWallets[randomIndex];
+
+                    // Tambahkan transaksi acak (1 sampai 5)
+                    randomWalletObj.txs += Math.floor(Math.random() * 5) + 1;
+
+                    // Update data di tabel utama
+                    const indexInMainData = globalLeaderboardData.findIndex(u => u.wallet === randomWalletObj.wallet);
+                    globalLeaderboardData[indexInMainData].txs = randomWalletObj.txs;
+
+                    // Render ulang tabel, dan kirim alamat wallet yang baru diupdate agar berkedip hijau
+                    renderLeaderboard(randomWalletObj.wallet);
+                }
+            }
+        }, 3000); // Bergerak setiap 3 detik
+        
     </script>
 </body>
 </html>

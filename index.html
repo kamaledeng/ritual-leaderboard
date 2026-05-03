@@ -133,7 +133,6 @@
         td { padding: 18px 20px; border-bottom: 1px solid rgba(42, 50, 65, 0.5); font-size: 14px; transition: background-color 0.5s ease; }
         tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
         
-        /* Animasi KILATAN HIJAU saat angka bertambah */
         .row-update { animation: flashGreen 1.5s ease-out; }
         @keyframes flashGreen {
             0% { background-color: rgba(0, 255, 136, 0.2); }
@@ -177,8 +176,6 @@
         }
         .wallet-option:hover { border-color: var(--accent-ritual); background-color: rgba(139, 92, 246, 0.05); }
     </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body>
 
@@ -222,11 +219,11 @@
                     My Profile
                 </h2>
                 <div class="streaming-badge" id="liveBadge" style="display: none;">
-                    <span class="pulse-circle"></span> Live Sync
+                    <span class="pulse-circle"></span> Explorer Sync
                 </div>
             </div>
             
-            <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 30px; font-size: 14px;">Your personal testnet statistics and faucet usage.</p>
+            <p style="color: var(--text-muted); margin-top: -15px; margin-bottom: 30px; font-size: 14px;">Your personal testnet statistics directly from Ritual Explorer.</p>
 
             <div id="disconnectedState" class="disconnected-overlay">
                 <div class="lock-icon">🔒</div>
@@ -264,7 +261,6 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ritual)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     Global Leaderboard
                 </h2>
-                <!-- Badge Streaming Live di Leaderboard -->
                 <div class="streaming-badge">
                     <span class="pulse-circle"></span> Live Feed
                 </div>
@@ -379,6 +375,9 @@
             } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
         }
 
+        // ===============================================================
+        // FUNGSI BARU: TARIK DATA ASLI 100% DARI RITUAL EXPLORER API
+        // ===============================================================
         async function loadRealUserProfile(address) {
             document.getElementById('disconnectedState').classList.add('hidden');
             document.getElementById('connectedState').classList.add('active');
@@ -391,24 +390,32 @@
                 document.getElementById('profileTxs').textContent = "...";
                 document.getElementById('profileBalance').innerHTML = `... <span class="currency">RITUAL</span>`;
 
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const txCount = await provider.getTransactionCount(address);
-                const balanceWei = await provider.getBalance(address);
-                const balanceEth = ethers.formatEther(balanceWei);
-                const formattedBalance = parseFloat(balanceEth).toFixed(3);
+                // Base URL dari Ritual Explorer
+                const explorerApi = "https://explorer.ritualfoundation.org/api";
 
-                document.getElementById('profileTxs').textContent = txCount;
-                document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
+                // 1. Fetch Jumlah Transaksi Asli (Nonce)
+                const txResponse = await fetch(`${explorerApi}?module=proxy&action=eth_getTransactionCount&address=${address}&tag=latest`);
+                const txData = await txResponse.json();
+                const txCount = parseInt(txData.result, 16); // Ubah format Hex ke angka biasa
 
-                // Masukkan data kita ke Leaderboard
+                // 2. Fetch Saldo Asli
+                const balResponse = await fetch(`${explorerApi}?module=account&action=balance&address=${address}`);
+                const balData = await balResponse.json();
+                const balanceEth = (balData.result / 1e18).toFixed(3); // Ubah dari Wei ke pecahan desimal
+
+                // 3. Tampilkan Data
+                document.getElementById('profileTxs').textContent = txCount.toLocaleString();
+                document.getElementById('profileBalance').innerHTML = `${balanceEth} <span class="currency">RITUAL</span>`;
+
+                // 4. Masukkan data kita ke Leaderboard
                 globalLeaderboardData = globalLeaderboardData.filter(u => u.wallet.toLowerCase() !== address.toLowerCase());
                 globalLeaderboardData.push({ wallet: address, txs: txCount });
                 renderLeaderboard();
 
             } catch (err) {
-                console.error("Gagal menarik data:", err);
-                document.getElementById('profileTxs').textContent = "Error";
-                document.getElementById('profileBalance').innerHTML = `Error`;
+                console.error("Gagal menarik data dari Ritual Explorer:", err);
+                document.getElementById('profileTxs').textContent = "Error API";
+                document.getElementById('profileBalance').innerHTML = `Error API`;
             }
         }
 
@@ -421,8 +428,6 @@
 
             globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
-                
-                // Tambahkan class animasi 'row-update' jika wallet ini baru saja diupdate angkanya
                 if(updatedWallet && user.wallet === updatedWallet) {
                     row.classList.add('row-update');
                 }
@@ -460,33 +465,20 @@
             });
         });
 
-        // ==========================================
-        // FITUR BARU: SIMULASI LIVE NETWORK (Gerak!)
-        // ==========================================
+        // --- SIMULASI LIVE NETWORK (Gerak!) ---
         setInterval(() => {
-            // Kita hanya jalankan simulasi jika Leaderboard sedang dibuka, supaya browser tidak berat
             if (document.getElementById('leaderboard-section').style.display === 'block') {
-                
-                // Buat daftar dompet (kecuali dompet pengguna yang sedang connect agar tidak merusak data asli)
                 const otherWallets = globalLeaderboardData.filter(u => u.wallet.toLowerCase() !== connectedWalletAddress.toLowerCase());
-                
                 if (otherWallets.length > 0) {
-                    // Pilih 1 dompet secara acak
                     const randomIndex = Math.floor(Math.random() * otherWallets.length);
                     const randomWalletObj = otherWallets[randomIndex];
-
-                    // Tambahkan transaksi acak (1 sampai 5)
                     randomWalletObj.txs += Math.floor(Math.random() * 5) + 1;
-
-                    // Update data di tabel utama
                     const indexInMainData = globalLeaderboardData.findIndex(u => u.wallet === randomWalletObj.wallet);
                     globalLeaderboardData[indexInMainData].txs = randomWalletObj.txs;
-
-                    // Render ulang tabel, dan kirim alamat wallet yang baru diupdate agar berkedip hijau
                     renderLeaderboard(randomWalletObj.wallet);
                 }
             }
-        }, 3000); // Bergerak setiap 3 detik
+        }, 3000); 
         
     </script>
 </body>

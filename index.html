@@ -82,11 +82,14 @@
         .profile-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Wallet Display dengan efek hover untuk copy */
         .wallet-display {
             background-color: var(--bg-main); border: 1px solid var(--border-color);
             padding: 15px 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
             color: var(--accent-green); margin-bottom: 25px; display: inline-block; font-size: 15px;
+            cursor: pointer; transition: all 0.2s;
         }
+        .wallet-display:hover { background-color: rgba(0, 255, 136, 0.05); border-color: var(--accent-green); }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .stat-card-custom {
@@ -137,7 +140,16 @@
         tr:nth-child(1) .rank-badge { background-color: rgba(251, 191, 36, 0.1); color: #FBBF24; }
         tr:nth-child(2) .rank-badge { background-color: rgba(156, 163, 175, 0.1); color: #9CA3AF; }
         tr:nth-child(3) .rank-badge { background-color: rgba(180, 83, 9, 0.1); color: #B45309; }
-        .wallet-address { font-family: 'JetBrains Mono', monospace; color: var(--text-main); }
+        
+        /* Desain baru agar teks dompet di tabel terlihat bisa diklik */
+        .wallet-address { 
+            font-family: 'JetBrains Mono', monospace; 
+            color: var(--text-main); 
+            cursor: pointer; 
+            transition: color 0.2s; 
+        }
+        .wallet-address:hover { color: var(--accent-green); }
+        
         .tx-count { font-weight: 600; color: var(--accent-green); font-size: 15px; }
 
         /* --- MODAL WALLET --- */
@@ -184,7 +196,8 @@
                     Leaderboard
                 </a>
             </div>
-            <button id="navConnectBtn" class="connect-btn">Connect Wallet</button>
+            <!-- Tombol Kanan Atas -->
+            <button id="navConnectBtn" class="connect-btn" title="Click to copy address">Connect Wallet</button>
         </div>
     </div>
 
@@ -224,7 +237,8 @@
             </div>
 
             <div id="connectedState" class="profile-content">
-                <div class="wallet-display" id="profileAddress">0x...</div>
+                <!-- Wallet di Profile, juga bisa di-klik untuk copy -->
+                <div class="wallet-display" id="profileAddress" title="Click to copy address">0x...</div>
                 
                 <div class="stats-grid">
                     <div class="stat-card-custom">
@@ -298,7 +312,7 @@
             profileSection.style.display = 'none'; leaderboardSection.style.display = 'block'; 
         });
 
-        // --- DATA LEADERBOARD DUMMY AWAL ---
+        // --- DATA LEADERBOARD DUMMY ---
         let globalLeaderboardData = [
             { wallet: "0x1a2b890c93c4df1e2a", txs: 24500 },
             { wallet: "0x9f8e432a27d6ca9b5f", txs: 18320 },
@@ -309,15 +323,44 @@
             { wallet: "0x8a9b332f14c5df8e7b", txs: 6100 }
         ];
 
-        // --- Wallet Logic ---
+        // --- Wallet Logic & Interaksi ---
         const navConnectBtn = document.getElementById('navConnectBtn');
         const walletModal = document.getElementById('walletModal');
         const closeModal = document.getElementById('closeModal');
         const liveBadge = document.getElementById('liveBadge');
+        const profileAddress = document.getElementById('profileAddress');
         
+        // LOGIKA BARU: Jika diklik saat konek, akan Copy Address
         navConnectBtn.addEventListener('click', () => {
-            if (!navConnectBtn.classList.contains('connected')) walletModal.classList.add('active');
+            if (!navConnectBtn.classList.contains('connected')) {
+                walletModal.classList.add('active');
+            } else {
+                // Menjalankan perintah Copy Address
+                const fullAddress = navConnectBtn.getAttribute('data-full-address');
+                if(fullAddress) {
+                    navigator.clipboard.writeText(fullAddress);
+                    const originalText = navConnectBtn.textContent;
+                    navConnectBtn.textContent = "Copied! 📋";
+                    navConnectBtn.style.color = "var(--accent-green)";
+                    setTimeout(() => {
+                        navConnectBtn.textContent = originalText;
+                        navConnectBtn.style.color = "var(--text-main)";
+                    }, 1500);
+                }
+            }
         });
+
+        // Sama untuk alamat dompet di dalam kartu profil
+        profileAddress.addEventListener('click', () => {
+            const fullAddress = profileAddress.getAttribute('data-full-address');
+            if(fullAddress) {
+                navigator.clipboard.writeText(fullAddress);
+                const originalText = profileAddress.textContent;
+                profileAddress.textContent = "Address Copied!";
+                setTimeout(() => { profileAddress.textContent = originalText; }, 1500);
+            }
+        });
+
         closeModal.addEventListener('click', () => walletModal.classList.remove('active'));
 
         // Fungsi Connect Asli via MetaMask
@@ -330,9 +373,13 @@
                     const shortAddress = `${account.substring(0,6)}...${account.substring(account.length-4)}`;
                     navConnectBtn.textContent = shortAddress;
                     navConnectBtn.classList.add('connected');
+                    
+                    // Simpan alamat lengkap di belakang layar untuk fitur copy
+                    navConnectBtn.setAttribute('data-full-address', account); 
+                    
                     walletModal.classList.remove('active');
                     
-                    // Panggil data asli setelah connect
+                    // Panggil data asli
                     loadRealUserProfile(account);
                 } catch (error) { console.error("Koneksi dibatalkan:", error); }
             } else { alert(`Tolong install ekstensi MetaMask atau Web3 wallet lainnya!`); }
@@ -343,31 +390,26 @@
             document.getElementById('disconnectedState').classList.add('hidden');
             document.getElementById('connectedState').classList.add('active');
             liveBadge.style.display = "flex"; 
-            document.getElementById('profileAddress').textContent = address;
+            
+            profileAddress.textContent = address;
+            profileAddress.setAttribute('data-full-address', address);
 
             try {
                 document.getElementById('profileTxs').textContent = "...";
                 document.getElementById('profileBalance').innerHTML = `... <span class="currency">RITUAL</span>`;
 
-                // 1. MEMBACA DATA ASLI DARI METAMASK
                 const provider = new ethers.BrowserProvider(window.ethereum);
                 const txCount = await provider.getTransactionCount(address);
                 const balanceWei = await provider.getBalance(address);
                 const balanceEth = ethers.formatEther(balanceWei);
-                const formattedBalance = parseFloat(balanceEth).toFixed(3); // 3 angka desimal
+                const formattedBalance = parseFloat(balanceEth).toFixed(3);
 
-                // 2. TAMPILKAN DI PROFIL (100% ASLI)
                 document.getElementById('profileTxs').textContent = txCount;
                 document.getElementById('profileBalance').innerHTML = `${formattedBalance} <span class="currency">RITUAL</span>`;
 
-                // 3. SUNTIKKAN DATA ASLI KE LEADERBOARD
-                // Hapus alamat kita jika sebelumnya sudah ada di dummy array
+                // Update data Leaderboard
                 globalLeaderboardData = globalLeaderboardData.filter(u => u.wallet.toLowerCase() !== address.toLowerCase());
-                
-                // Tambahkan data asli kita ke array Leaderboard
                 globalLeaderboardData.push({ wallet: address, txs: txCount });
-
-                // Render ulang tabel Leaderboard agar kita muncul di ranking
                 renderLeaderboard();
 
             } catch (err) {
@@ -377,25 +419,41 @@
             }
         }
 
-        // --- RENDER LEADERBOARD ---
+        // --- RENDER LEADERBOARD (Ditambah Fitur Copy) ---
         function renderLeaderboard() {
             const tableBody = document.getElementById('leaderboardBody');
             tableBody.innerHTML = ''; 
 
-            // Urutkan data dari yang transaksinya paling banyak
             globalLeaderboardData.sort((a, b) => b.txs - a.txs);
 
             globalLeaderboardData.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><span class="rank-badge">${index + 1}</span></td>
-                    <td><span class="wallet-address">${user.wallet}</span></td>
+                    <td><span class="wallet-address" data-wallet="${user.wallet}" title="Click to copy">${user.wallet}</span></td>
                     <td><span class="tx-count">${user.txs.toLocaleString()} TXs</span></td>
                 `;
                 tableBody.appendChild(row);
             });
         }
         renderLeaderboard();
+
+        // Logika agar teks dompet di tabel Leaderboard bisa diklik untuk Copy
+        document.getElementById('leaderboardBody').addEventListener('click', function(e) {
+            if (e.target.classList.contains('wallet-address')) {
+                const fullWallet = e.target.getAttribute('data-wallet');
+                navigator.clipboard.writeText(fullWallet);
+                
+                const originalText = e.target.textContent;
+                e.target.textContent = "Copied! ✅";
+                e.target.style.color = "var(--accent-green)";
+                
+                setTimeout(() => {
+                    e.target.textContent = originalText;
+                    e.target.style.color = ""; // Kembalikan ke warna asli
+                }, 1500);
+            }
+        });
 
         // Fitur Filter/Pencarian Rank Wallet
         document.getElementById('rankSearchInput').addEventListener('input', function(e) {
